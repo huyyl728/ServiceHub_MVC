@@ -65,7 +65,13 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-// Initialize database roles
 await DbSeeder.InitializeAsync(app.Services);
+
+if (app.Environment.IsDevelopment())
+{
+    await DevAccountSeeder.InitializeAsync(
+        app.Services,
+        app.Configuration);
+}
 
 app.Run();
