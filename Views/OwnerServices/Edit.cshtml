@@ -1,0 +1,5 @@
+@model ServiceHubMVC.ViewModels.OwnerServiceFormViewModel
+@{ ViewData["Title"] = "Sửa dịch vụ"; }
+<h1>Sửa dịch vụ</h1>
+<form asp-action="Edit" asp-route-id="@(ViewData["ResourceId"])" method="post" asp-antiforgery="true"><partial name="_ServiceForm" model="Model" /></form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
