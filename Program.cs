@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using ServiceHubMVC.Services;
 using Microsoft.EntityFrameworkCore;
 using ServiceHubMVC.Data;
 using ServiceHubMVC.Models;
@@ -7,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // 1. MVC
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<BookingStatusService>();
+
 
 // 2. Database
 var connectionString =
