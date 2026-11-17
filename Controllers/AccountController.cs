@@ -1,3 +1,5 @@
+
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +49,7 @@ public class AccountController : Controller
         }
 
         var email = model.Email.Trim();
+
         var user = new ApplicationUser
         {
             UserName = email,
@@ -54,29 +57,40 @@ public class AccountController : Controller
             FullName = model.FullName.Trim()
         };
 
-        // Quyền đăng ký công khai luôn là Customer, không nhận vai trò từ biểu mẫu.
-        var createResult = await _userManager.CreateAsync(user, model.Password);
+        var createResult = await _userManager.CreateAsync(
+            user, model.Password);
+
         if (!createResult.Succeeded)
         {
-            foreach (var error in createResult.Errors)
+            var messages = createResult.Errors
+                .Select(error => TranslateIdentityError(error.Code))
+                .Distinct();
+
+            foreach (var message in messages)
             {
-                ModelState.AddModelError(string.Empty, TranslateIdentityError(error.Code));
+                ModelState.AddModelError(string.Empty, message);
             }
 
             return View(model);
         }
 
-        var roleResult = await _userManager.AddToRoleAsync(user, "Customer");
+        var roleResult = await _userManager.AddToRoleAsync(
+            user, "Customer");
+
         if (!roleResult.Succeeded)
         {
-            // Tránh lưu tài khoản chưa được gán vai trò nếu cấu hình phân quyền gặp lỗi.
             await _userManager.DeleteAsync(user);
-            ModelState.AddModelError(string.Empty,
+
+            ModelState.AddModelError(
+                string.Empty,
                 "Chưa thể hoàn tất đăng ký. Vui lòng thử lại sau.");
+
             return View(model);
         }
 
-        await _signInManager.SignInAsync(user, isPersistent: false);
+        await _signInManager.SignInAsync(
+            user, isPersistent: false);
+
         return RedirectToAction(nameof(Profile));
     }
 
@@ -89,7 +103,10 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Profile));
         }
 
-        return View(new LoginViewModel { ReturnUrl = returnUrl });
+        return View(new LoginViewModel
+        {
+            ReturnUrl = returnUrl
+        });
     }
 
     [HttpPost]
@@ -107,22 +124,28 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var user = await _userManager.FindByEmailAsync(model.Email.Trim());
+        var user = await _userManager.FindByEmailAsync(
+            model.Email.Trim());
+
         if (user is null)
         {
-            ModelState.AddModelError(string.Empty, "Email hoặc mật khẩu không chính xác.");
+            ModelState.AddModelError(
+                string.Empty,
+                "Email hoặc mật khẩu không chính xác.");
+
             return View(model);
         }
 
-        // Identity xác minh mật khẩu băm; khóa tạm thời khi thử sai nhiều lần.
         var result = await _signInManager.PasswordSignInAsync(
-            user, model.Password, model.RememberMe, lockoutOnFailure: true);
+            user,
+            model.Password,
+            model.RememberMe,
+            lockoutOnFailure: true);
 
         if (result.Succeeded)
         {
-            // Chỉ chấp nhận đường dẫn nội bộ, ngăn chuyển hướng sang website khác.
-            if (!string.IsNullOrWhiteSpace(model.ReturnUrl) &&
-                Url.IsLocalUrl(model.ReturnUrl))
+            if (!string.IsNullOrWhiteSpace(model.ReturnUrl)
+                && Url.IsLocalUrl(model.ReturnUrl))
             {
                 return LocalRedirect(model.ReturnUrl);
             }
@@ -130,10 +153,12 @@ public class AccountController : Controller
             return RedirectToAction(nameof(Profile));
         }
 
-        ModelState.AddModelError(string.Empty,
+        ModelState.AddModelError(
+            string.Empty,
             result.IsLockedOut
                 ? "Tài khoản tạm thời bị khóa do đăng nhập sai nhiều lần."
                 : "Email hoặc mật khẩu không chính xác.");
+
         return View(model);
     }
 
@@ -142,8 +167,8 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        // Đăng xuất bằng POST kèm mã chống giả mạo, không dùng liên kết GET.
         await _signInManager.SignOutAsync();
+
         return RedirectToAction("Index", "Home");
     }
 
@@ -152,12 +177,14 @@ public class AccountController : Controller
     public async Task<IActionResult> Profile()
     {
         var user = await _userManager.GetUserAsync(User);
+
         if (user is null)
         {
             return Challenge();
         }
 
         ViewData["Email"] = user.Email;
+
         return View(new UpdateProfileViewModel
         {
             FullName = user.FullName,
@@ -168,53 +195,77 @@ public class AccountController : Controller
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Profile(UpdateProfileViewModel model)
+    public async Task<IActionResult> Profile(
+        UpdateProfileViewModel model)
     {
         var user = await _userManager.GetUserAsync(User);
+
         if (user is null)
         {
             return Challenge();
         }
 
         ViewData["Email"] = user.Email;
+
         if (!ModelState.IsValid)
         {
             return View(model);
         }
 
-        // Chỉ lấy ID từ phiên đăng nhập; không nhận UserId/Role/Email từ biểu mẫu.
         user.FullName = model.FullName.Trim();
+
         user.PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber)
             ? null
             : model.PhoneNumber.Trim();
 
         var result = await _userManager.UpdateAsync(user);
+
         if (!result.Succeeded)
         {
-            ModelState.AddModelError(string.Empty,
+            ModelState.AddModelError(
+                string.Empty,
                 "Không thể cập nhật hồ sơ. Vui lòng thử lại.");
+
             return View(model);
         }
 
         await _signInManager.RefreshSignInAsync(user);
-        TempData["SuccessMessage"] = "Cập nhật hồ sơ thành công.";
+
+        TempData["SuccessMessage"] =
+            "Cập nhật hồ sơ thành công.";
+
         return RedirectToAction(nameof(Profile));
     }
 
     [HttpGet]
     [AllowAnonymous]
-    public IActionResult AccessDenied() => View();
-
-    private static string TranslateIdentityError(string code) => code switch
+    public IActionResult AccessDenied()
     {
-        "DuplicateEmail" or "DuplicateUserName" =>
-            "Email này đã được sử dụng.",
-        "PasswordTooShort" => "Mật khẩu quá ngắn (tối thiểu 8 ký tự).",
-        "PasswordRequiresDigit" => "Mật khẩu cần có ít nhất một chữ số.",
-        "PasswordRequiresLower" => "Mật khẩu cần có chữ cái thường.",
-        "PasswordRequiresUpper" => "Mật khẩu cần có chữ cái in hoa.",
-        "PasswordRequiresNonAlphanumeric" =>
-            "Mật khẩu cần có ít nhất một ký tự đặc biệt.",
-        _ => "Dữ liệu đăng ký chưa hợp lệ. Vui lòng kiểm tra và thử lại."
-    };
+        return View();
+    }
+
+    private static string TranslateIdentityError(string code) =>
+        code switch
+        {
+            "DuplicateEmail" or "DuplicateUserName" =>
+                "Email này đã được sử dụng.",
+
+            "PasswordTooShort" =>
+                "Mật khẩu quá ngắn (tối thiểu 8 ký tự).",
+
+            "PasswordRequiresDigit" =>
+                "Mật khẩu cần có ít nhất một chữ số.",
+
+            "PasswordRequiresLower" =>
+                "Mật khẩu cần có chữ cái thường.",
+
+            "PasswordRequiresUpper" =>
+                "Mật khẩu cần có chữ cái in hoa.",
+
+            "PasswordRequiresNonAlphanumeric" =>
+                "Mật khẩu cần có ít nhất một ký tự đặc biệt.",
+
+            _ =>
+                "Dữ liệu đăng ký chưa hợp lệ. Vui lòng kiểm tra và thử lại."
+        };
 }
