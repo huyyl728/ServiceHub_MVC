@@ -1,8 +1,33 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Trang chủ";
 }
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="home-hero">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+            <span class="hero-eyebrow">NỀN TẢNG ĐẶT LỊCH DỊCH VỤ</span>
+            <h1 class="display-5 fw-bold mt-3">Đặt lịch dễ dàng,<br />chủ động thời gian.</h1>
+            <p class="lead mt-3">ServiceHub kết nối khách hàng với các cơ sở cung cấp dịch vụ, giúp việc tìm kiếm và quản lý lịch hẹn trở nên thuận tiện hơn.</p>
+            <a class="btn btn-light btn-lg mt-2" href="#how-it-works">Tìm hiểu cách hoạt động</a>
+        </div>
+        <div class="col-lg-5">
+            <div class="hero-panel">
+                <span class="hero-eyebrow">SERVICEHUB</span>
+                <h2 class="h4 mt-3">Một nơi cho mọi lịch hẹn</h2>
+                <ul class="list-unstyled mb-0">
+                    <li>01 · Tìm dịch vụ phù hợp</li>
+                    <li>02 · Chọn thời gian mong muốn</li>
+                    <li>03 · Theo dõi lịch hẹn</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="how-it-works" class="mt-5" aria-labelledby="how-title">
+    <h2 class="h3 fw-bold" id="how-title">ServiceHub hoạt động như thế nào?</h2>
+    <p class="text-muted">Nền tảng được xây dựng để hỗ trợ ba bước trong quá trình đặt lịch.</p>
+    <div class="row g-3 mt-2">
+        <div class="col-md-4"><article class="feature-card"><span class="step-number">01</span><h3 class="h5 mt-3">Khám phá dịch vụ</h3><p class="mb-0">Tìm hiểu cơ sở, giá và thời lượng dịch vụ.</p></article></div>
+        <div class="col-md-4"><article class="feature-card"><span class="step-number">02</span><h3 class="h5 mt-3">Chọn lịch phù hợp</h3><p class="mb-0">Chọn dịch vụ và thời điểm mong muốn.</p></article></div>
+        <div class="col-md-4"><article class="feature-card"><span class="step-number">03</span><h3 class="h5 mt-3">Quản lý lịch hẹn</h3><p class="mb-0">Theo dõi quá trình xử lý lịch đặt của mình.</p></article></div>
+    </div>
+</section>
