@@ -1,45 +1,36 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ServiceHubMVC</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - ServiceHub</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ServiceHubMVC.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ServiceHubMVC</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+    <a class="visually-hidden-focusable skip-link" href="#main-content">Đến nội dung chính</a>
+    <header class="site-header">
+        <nav class="navbar navbar-expand-lg navbar-light" aria-label="Điều hướng chính">
+            <div class="container">
+                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">Service<span>Hub</span></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation"
+                        aria-controls="mainNavigation" aria-expanded="false" aria-label="Mở hoặc đóng menu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+                <div class="collapse navbar-collapse" id="mainNavigation">
+                    <partial name="_Navigation" />
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - ServiceHubMVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <main id="main-content" class="container py-4 py-lg-5 flex-grow-1">
+        <partial name="_StatusMessages" />
+        @RenderBody()
+    </main>
+    <footer class="site-footer">
+        <div class="container d-flex flex-column flex-sm-row justify-content-between gap-2 py-4">
+            <span>© @DateTime.Now.Year ServiceHub · Đặt lịch dịch vụ trực tuyến</span>
+            <a asp-controller="Home" asp-action="Privacy">Quyền riêng tư</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
