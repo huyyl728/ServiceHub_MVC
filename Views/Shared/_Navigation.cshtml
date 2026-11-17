@@ -1,0 +1,71 @@
+@using Microsoft.AspNetCore.Mvc.Controllers
+@using Microsoft.AspNetCore.Mvc.Infrastructure
+@using Microsoft.AspNetCore.Mvc.ActionConstraints
+@inject IActionDescriptorCollectionProvider Actions
+@{
+    // Chỉ hiện action MVC đã đăng ký; phân quyền vẫn do máy chủ thực hiện.
+    bool HasAction(string controller, string action, string method = "GET") =>
+        Actions.ActionDescriptors.Items.OfType<ControllerActionDescriptor>().Any(item =>
+            item.ControllerName == controller && item.ActionName == action &&
+            (!item.RouteValues.TryGetValue("area", out var area) || string.IsNullOrEmpty(area)) &&
+            (item.ActionConstraints?.OfType<HttpMethodActionConstraint>().Any() == true
+                ? item.ActionConstraints.OfType<HttpMethodActionConstraint>().Any(c =>
+                    c.HttpMethods.Contains(method, StringComparer.OrdinalIgnoreCase))
+                : method == "GET"));
+    var signedIn = User.Identity?.IsAuthenticated == true;
+    var role = User.IsInRole("Admin") ? "Quản trị viên" :
+        User.IsInRole("Owner") ? "Chủ cơ sở" :
+        User.IsInRole("Customer") ? "Khách hàng" : "Thành viên";
+}
+<ul class="navbar-nav me-auto gap-lg-2">
+    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+    @if (HasAction("Services", "Index"))
+    {
+        <li class="nav-item"><a class="nav-link" asp-controller="Services" asp-action="Index">Dịch vụ</a></li>
+    }
+    @if (signedIn && User.IsInRole("Customer") && HasAction("Bookings", "Index"))
+    {
+        <li class="nav-item"><a class="nav-link" asp-controller="Bookings" asp-action="Index">Lịch của tôi</a></li>
+    }
+    @if (signedIn && User.IsInRole("Owner") && HasAction("Businesses", "Index"))
+    {
+        <li class="nav-item"><a class="nav-link" asp-controller="Businesses" asp-action="Index">Quản lý cơ sở</a></li>
+    }
+    @if (signedIn && User.IsInRole("Owner") && HasAction("Bookings", "Owner"))
+    {
+        <li class="nav-item"><a class="nav-link" asp-controller="Bookings" asp-action="Owner">Quản lý lịch đặt</a></li>
+    }
+    @if (signedIn && (User.IsInRole("Owner") || User.IsInRole("Admin")) && HasAction("Dashboard", "Index"))
+    {
+        <li class="nav-item"><a class="nav-link" asp-controller="Dashboard" asp-action="Index">Tổng quan</a></li>
+    }
+</ul>
+<ul class="navbar-nav align-items-lg-center gap-2">
+    @if (signedIn)
+    {
+        <li class="nav-item"><span class="role-label">@role</span></li>
+        @if (HasAction("Account", "Profile"))
+        {
+            <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Profile">Hồ sơ</a></li>
+        }
+        @if (HasAction("Account", "Logout", "POST"))
+        {
+            <li class="nav-item">
+                <form asp-controller="Account" asp-action="Logout" method="post" asp-antiforgery="true">
+                    <button class="btn btn-outline-primary" type="submit">Đăng xuất</button>
+                </form>
+            </li>
+        }
+    }
+    else
+    {
+        @if (HasAction("Account", "Login"))
+        {
+            <li class="nav-item"><a class="btn btn-outline-primary" asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
+        }
+        @if (HasAction("Account", "Register"))
+        {
+            <li class="nav-item"><a class="btn btn-primary" asp-controller="Account" asp-action="Register">Đăng ký</a></li>
+        }
+    }
+</ul>
