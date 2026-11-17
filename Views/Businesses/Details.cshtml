@@ -1,0 +1,7 @@
+@model Business
+@{ ViewData["Title"] = "Chi tiết cơ sở"; }
+<h1>@Model.Name</h1>
+<dl><dt>Địa chỉ</dt><dd>@Model.Address</dd><dt>Mô tả</dt><dd>@Model.Description</dd><dt>Trạng thái</dt><dd>@(Model.IsActive ? "Đang hoạt động" : "Tạm ngừng")</dd></dl>
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Sửa</a>
+<a asp-controller="OwnerServices" asp-action="Index" asp-route-businessId="@Model.Id" class="btn btn-outline-primary">Quản lý dịch vụ</a>
+<a asp-action="Index">Quay lại</a>
