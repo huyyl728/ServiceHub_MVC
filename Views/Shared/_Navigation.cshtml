@@ -23,13 +23,17 @@
     {
         <li class="nav-item"><a class="nav-link" asp-controller="Services" asp-action="Index">Dịch vụ</a></li>
     }
-    @if (signedIn && User.IsInRole("Customer") && HasAction("Bookings", "MyBookings"))
+    @if (signedIn && User.IsInRole("Customer") && HasAction("Bookings", "Index"))
     {
-        <li class="nav-item"><a class="nav-link" asp-controller="Bookings" asp-action="MyBookings">Lịch của tôi</a></li>
+        <li class="nav-item"><a class="nav-link" asp-controller="Bookings" asp-action="Index">Lịch của tôi</a></li>
     }
     @if (signedIn && User.IsInRole("Owner") && HasAction("Businesses", "Index"))
     {
         <li class="nav-item"><a class="nav-link" asp-controller="Businesses" asp-action="Index">Quản lý cơ sở</a></li>
+    }
+    @if (signedIn && User.IsInRole("Owner") && HasAction("Bookings", "Owner"))
+    {
+        <li class="nav-item"><a class="nav-link" asp-controller="Bookings" asp-action="Owner">Quản lý lịch đặt</a></li>
     }
     @if (signedIn && (User.IsInRole("Owner") || User.IsInRole("Admin")) && HasAction("Dashboard", "Index"))
     {
