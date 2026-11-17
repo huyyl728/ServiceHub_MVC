@@ -56,13 +56,14 @@
             }
             else
             {
-                <form asp-controller="Services" asp-action="Book" asp-route-id="@item.Id" method="post" asp-antiforgery="true">
+                <form asp-controller="Services" asp-action="Book" asp-route-id="@item.Id" method="post" asp-antiforgery="true" data-prevent-repeat>
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                     <label asp-for="StartTimeLocal" class="form-label">Ngày và giờ bắt đầu</label>
-                    <input asp-for="StartTimeLocal" type="datetime-local" class="form-control" required aria-describedby="time-help" />
-                    <span asp-validation-for="StartTimeLocal" class="text-danger"></span>
+                    <input asp-for="StartTimeLocal" type="datetime-local" class="form-control" required aria-describedby="time-help time-error" aria-invalid="@(ViewData.ModelState.TryGetValue(nameof(Model.StartTimeLocal), out var timeState) && timeState.Errors.Count > 0 ? "true" : "false")" />
+                    <span asp-validation-for="StartTimeLocal" id="time-error" class="text-danger" aria-live="polite"></span>
                     <p id="time-help" class="small text-muted mt-2">Giờ Việt Nam (UTC+7). Giá và thời lượng được máy chủ xác nhận khi đặt lịch.</p>
                     <button type="submit" class="btn btn-primary w-100">Xác nhận đặt lịch</button>
+                    <p class="form-processing" data-processing-message role="status" hidden>Đang xử lý yêu cầu, vui lòng chờ…</p>
                 </form>
             }
         </section>

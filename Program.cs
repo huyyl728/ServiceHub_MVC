@@ -2,11 +2,17 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ServiceHubMVC.Data;
 using ServiceHubMVC.Models;
+using ServiceHubMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. MVC
 builder.Services.AddControllersWithViews();
+// Đăng ký dịch vụ xử lý nghiệp vụ đặt lịch
+builder.Services.AddScoped<BookingService>();
+
+// Dịch vụ quản lý và chuyển trạng thái lịch đặt
+builder.Services.AddScoped<BookingStatusService>();
 
 // 2. Database
 var connectionString =

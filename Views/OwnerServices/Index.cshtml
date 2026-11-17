@@ -1,0 +1,28 @@
+@model Business
+@{ ViewData["Title"] = "Quản lý dịch vụ"; }
+<h1>Dịch vụ của @Model.Name</h1>
+<partial name="_OwnerResourceMessages" />
+<a asp-action="Create" asp-route-businessId="@Model.Id" class="btn btn-primary mb-3">Thêm dịch vụ</a>
+<a asp-controller="Businesses" asp-action="Index" class="btn btn-secondary mb-3">Về cơ sở</a>
+@if (Model.Services.Count == 0) { <p>Chưa có dịch vụ nào.</p> }
+<div class="table-responsive">
+<table class="table align-middle">
+    <thead><tr><th>Tên</th><th>Danh mục</th><th>Giá (VNĐ)</th><th>Thời lượng</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+    <tbody>
+    @foreach (var item in Model.Services.OrderBy(s => s.Name).ThenBy(s => s.Id))
+    {
+        <tr><td>@item.Name</td><td>@item.Category</td><td>@item.Price.ToString("N2")</td><td>@item.DurationMinutes phút</td><td>@(item.IsAvailable ? "Đang mở" : "Tạm ngừng")</td><td>
+            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Sửa</a>
+            <form asp-action="SetAvailable" asp-route-id="@item.Id" method="post" asp-antiforgery="true" class="d-inline">
+                <input type="hidden" name="available" value="@(!item.IsAvailable ? "true" : "false")" />
+                <button type="submit" class="btn btn-sm btn-warning">@(item.IsAvailable ? "Tạm ngừng" : "Mở lại")</button>
+            </form>
+            <form asp-action="Delete" asp-route-id="@item.Id" method="post" asp-antiforgery="true" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa dịch vụ này?');">
+                <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+            </form>
+        </td></tr>
+    }
+    </tbody>
+</table>
+</div>

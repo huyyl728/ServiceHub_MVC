@@ -1,0 +1,267 @@
+
+@model ServiceHubMVC.ViewModels.BookingListPageViewModel
+@using ServiceHubMVC.Models
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    var actionName = Model.IsOwner ? "Owner" : "Index";
+
+    ViewData["Title"] = Model.IsOwner
+        ? "Quản lý lịch đặt"
+        : "Lịch đặt của tôi";
+
+    var statusOptions = new List<SelectListItem>
+    {
+        new SelectListItem { Text = "Chờ xác nhận", Value = "0" },
+        new SelectListItem { Text = "Đã xác nhận", Value = "1" },
+        new SelectListItem { Text = "Đã hủy", Value = "2" },
+        new SelectListItem { Text = "Đã từ chối", Value = "3" },
+        new SelectListItem { Text = "Đã hoàn thành", Value = "4" }
+    };
+
+    var startPage = Math.Max(1, Model.Page - 2);
+    var endPage = Math.Min(Model.TotalPages, Model.Page + 2);
+}
+
+@functions {
+    private static string GetStatusText(BookingStatus status)
+    {
+        return status switch
+        {
+            BookingStatus.Pending => "Chờ xác nhận",
+            BookingStatus.Confirmed => "Đã xác nhận",
+            BookingStatus.Cancelled => "Đã hủy",
+            BookingStatus.Rejected => "Đã từ chối",
+            BookingStatus.Completed => "Đã hoàn thành",
+            _ => "Không xác định"
+        };
+    }
+
+    private static string GetStatusClass(BookingStatus status)
+    {
+        return status switch
+        {
+            BookingStatus.Pending => "bg-warning text-dark",
+            BookingStatus.Confirmed => "bg-primary",
+            BookingStatus.Cancelled => "bg-secondary",
+            BookingStatus.Rejected => "bg-danger",
+            BookingStatus.Completed => "bg-success",
+            _ => "bg-dark"
+        };
+    }
+}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h2>@ViewData["Title"]</h2>
+
+        @if (Model.IsOwner)
+        {
+            <p class="text-muted">
+                Theo dõi các lịch đặt tại cơ sở kinh doanh của bạn.
+            </p>
+        }
+        else
+        {
+            <p class="text-muted">
+                Xem và theo dõi những dịch vụ bạn đã đặt.
+            </p>
+        }
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">
+                Tìm kiếm và lọc lịch đặt
+            </h5>
+
+            <form method="get"
+                  asp-controller="Bookings"
+                  asp-action="@actionName">
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">
+                            Ngày đặt lịch
+                        </label>
+
+                        <input type="date"
+                               name="date"
+                               class="form-control"
+                               value="@(Model.Date?.ToString("yyyy-MM-dd"))" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Status" class="form-label">
+                            Trạng thái
+                        </label>
+
+                        <select asp-for="Status"
+                                asp-items="statusOptions"
+                                class="form-select">
+                            <option value="">Tất cả trạng thái</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            Lọc lịch
+                        </button>
+
+                        <a asp-controller="Bookings"
+                           asp-action="@actionName"
+                           class="btn btn-outline-secondary">
+                            Xóa lọc
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mb-3">
+        <h5>Danh sách lịch đặt</h5>
+
+        <span class="text-muted">
+            Tổng cộng: @Model.TotalItems lịch
+        </span>
+    </div>
+
+    @if (Model.Items.Count == 0)
+    {
+        <div class="alert alert-info">
+            Không tìm thấy lịch đặt nào phù hợp.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mã lịch</th>
+                        <th>Dịch vụ</th>
+                        <th>Cơ sở</th>
+
+                        @if (Model.IsOwner)
+                        {
+                            <th>Khách hàng</th>
+                        }
+
+                        <th>Bắt đầu</th>
+                        <th>Kết thúc</th>
+                        <th>Giá</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var booking in Model.Items)
+                    {
+                        <tr>
+                            <td>#@booking.Id</td>
+
+                            <td>@booking.ServiceName</td>
+
+                            <td>@booking.BusinessName</td>
+
+                            @if (Model.IsOwner)
+                            {
+                                <td>@booking.CustomerName</td>
+                            }
+
+                            <td>
+                                @(booking.StartTime
+                                    .ToOffset(TimeSpan.FromHours(7))
+                                    .ToString("dd/MM/yyyy HH:mm"))
+                            </td>
+
+                            <td>
+                                @(booking.EndTime
+                                    .ToOffset(TimeSpan.FromHours(7))
+                                    .ToString("dd/MM/yyyy HH:mm"))
+                            </td>
+
+                            <td>
+                                @booking.PriceAtBooking.ToString("N0") VNĐ
+                            </td>
+
+                            <td>
+                                <span class="badge @GetStatusClass(booking.Status)">
+                                    @GetStatusText(booking.Status)
+                                </span>
+                            </td>
+
+                            <td>
+                                <a asp-controller="Bookings"
+                                   asp-action="@(Model.IsOwner ? "OwnerDetails" : "Details")"
+                                   asp-route-id="@booking.Id"
+                                   class="btn btn-sm btn-outline-primary">
+                                    Xem chi tiết
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Phân trang lịch đặt">
+                <ul class="pagination justify-content-center">
+
+                    @if (Model.Page > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               asp-controller="Bookings"
+                               asp-action="@actionName"
+                               asp-route-page="@(Model.Page - 1)"
+                               asp-route-date="@(Model.Date?.ToString("yyyy-MM-dd"))"
+                               asp-route-status="@Model.Status">
+                                Trước
+                            </a>
+                        </li>
+                    }
+
+                    @for (int p = startPage; p <= endPage; p++)
+                    {
+                        <li class="page-item @(p == Model.Page ? "active" : "")">
+                            <a class="page-link"
+                               asp-controller="Bookings"
+                               asp-action="@actionName"
+                               asp-route-page="@p"
+                               asp-route-date="@(Model.Date?.ToString("yyyy-MM-dd"))"
+                               asp-route-status="@Model.Status">
+                                @p
+                            </a>
+                        </li>
+                    }
+
+                    @if (Model.Page < Model.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               asp-controller="Bookings"
+                               asp-action="@actionName"
+                               asp-route-page="@(Model.Page + 1)"
+                               asp-route-date="@(Model.Date?.ToString("yyyy-MM-dd"))"
+                               asp-route-status="@Model.Status">
+                                Tiếp
+                            </a>
+                        </li>
+                    }
+
+                </ul>
+            </nav>
+        }
+
+        <div class="text-center text-muted">
+            Trang @Model.Page / @Math.Max(1, Model.TotalPages)
+        </div>
+    }
+
+</div>

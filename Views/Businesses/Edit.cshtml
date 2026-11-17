@@ -1,0 +1,5 @@
+@model ServiceHubMVC.ViewModels.BusinessFormViewModel
+@{ ViewData["Title"] = "Sửa cơ sở"; }
+<h1>Sửa cơ sở</h1>
+<form asp-action="Edit" asp-route-id="@(ViewData["ResourceId"])" method="post" asp-antiforgery="true"><partial name="_BusinessForm" model="Model" /></form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
