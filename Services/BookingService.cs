@@ -111,7 +111,7 @@ public class BookingService
                     "Thời gian đặt lịch không hợp lệ.");
             }
 
-            // Kiểm tra lịch giữ chỗ có giao nhau hay không
+            // Kiểm tra khoản thời gian đặt lịch có giao nhau hay không
             bool isConflict = await _context.Bookings
                 .AnyAsync(b =>
                     b.ServiceId == serviceId

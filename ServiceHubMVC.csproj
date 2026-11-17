@@ -16,5 +16,10 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.14" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
   </ItemGroup>
-
+ <ItemGroup>
+  <!-- Không đưa mã nguồn kiểm thử vào ứng dụng web -->
+  <Compile Remove="tests/**/*.cs" />
+  <Content Remove="tests/**" />
+  <None Remove="tests/**" />
+</ItemGroup>
 </Project>
