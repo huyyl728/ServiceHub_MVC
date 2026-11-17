@@ -1,0 +1,67 @@
+@model ServiceHubMVC.ViewModels.ServiceListViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Tìm dịch vụ";
+    var culture = CultureInfo.GetCultureInfo("vi-VN");
+}
+<section class="content-panel mb-4">
+    <h1 class="h2 fw-bold">Khám phá dịch vụ</h1>
+    <p class="text-muted">Tìm dịch vụ phù hợp với nhu cầu của bạn.</p>
+    <form asp-controller="Services" asp-action="Index" method="get" class="row g-3 align-items-end">
+        <div class="col-12 col-md-6">
+            <label for="keyword" class="form-label">Từ khóa</label>
+            <input id="keyword" name="keyword" value="@Model.Keyword" class="form-control" placeholder="Tên dịch vụ hoặc cơ sở" />
+        </div>
+        <div class="col-12 col-md-4">
+            <label for="category" class="form-label">Danh mục</label>
+            <select id="category" name="category" class="form-select">
+                <option value="">Tất cả danh mục</option>
+                @foreach (var category in Model.Categories)
+                {
+                    <option value="@category" selected="@(category == Model.Category)">@category</option>
+                }
+            </select>
+        </div>
+        <div class="col-12 col-md-2 d-grid"><button class="btn btn-primary" type="submit">Tìm kiếm</button></div>
+        <div class="col-12"><a asp-controller="Services" asp-action="Index">Xóa bộ lọc</a></div>
+    </form>
+</section>
+@if (Model.Items.Count == 0)
+{
+    <partial name="_EmptyState" model='"Không tìm thấy dịch vụ phù hợp. Hãy thử thay đổi bộ lọc."' />
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var item in Model.Items)
+        {
+            <div class="col-12 col-md-6 col-xl-4">
+                <article class="feature-card d-flex flex-column gap-2">
+                    <span class="badge bg-light text-dark align-self-start">@item.Category</span>
+                    <h2 class="h5 fw-bold">@item.Name</h2>
+                    <p class="mb-0">@item.BusinessName</p>
+                    <p class="text-muted small">@item.Address</p>
+                    <div class="d-flex flex-wrap justify-content-between gap-2 mt-auto">
+                        <strong class="text-primary">@item.Price.ToString("N0", culture) đ</strong>
+                        <span>@item.DurationMinutes phút</span>
+                    </div>
+                    <a asp-controller="Services" asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary mt-2">Xem chi tiết</a>
+                </article>
+            </div>
+        }
+    </div>
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="d-flex flex-wrap justify-content-center align-items-center gap-3 mt-4" aria-label="Phân trang dịch vụ">
+            @if (Model.Page > 1)
+            {
+                <a class="btn btn-outline-primary" asp-action="Index" asp-route-keyword="@Model.Keyword" asp-route-category="@Model.Category" asp-route-page="@(Model.Page - 1)">Trang trước</a>
+            }
+            <span aria-current="page">Trang @Model.Page / @Model.TotalPages</span>
+            @if (Model.Page < Model.TotalPages)
+            {
+                <a class="btn btn-outline-primary" asp-action="Index" asp-route-keyword="@Model.Keyword" asp-route-category="@Model.Category" asp-route-page="@(Model.Page + 1)">Trang sau</a>
+            }
+        </nav>
+    }
+}
