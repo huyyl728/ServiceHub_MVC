@@ -2,7 +2,7 @@
 
 Website đặt lịch và quản lý dịch vụ trực tuyến.
 
-## CÔng nghệ sử dụng
+## Công nghệ sử dụng
 
 - ASP.NET Core 10 MVC
 - Razor Views, Bootstrap, JavaScript
