@@ -11,6 +11,9 @@ builder.Services.AddControllersWithViews();
 // Đăng ký dịch vụ xử lý nghiệp vụ đặt lịch
 builder.Services.AddScoped<BookingService>();
 
+// Dịch vụ quản lý và chuyển trạng thái lịch đặt
+builder.Services.AddScoped<BookingStatusService>();
+
 // 2. Database
 var connectionString =
     builder.Configuration.GetConnectionString("DefaultConnection")

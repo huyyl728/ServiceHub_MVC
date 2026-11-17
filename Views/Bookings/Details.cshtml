@@ -1,0 +1,224 @@
+
+@model ServiceHubMVC.ViewModels.BookingListItemViewModel
+@using ServiceHubMVC.Models
+
+@{
+    bool isOwner = ViewData["IsOwner"] is true;
+
+    var backAction = isOwner ? "Owner" : "Index";
+
+    ViewData["Title"] = "Chi tiết lịch đặt";
+
+    var now = DateTimeOffset.UtcNow;
+
+    bool canCancel = !isOwner
+        && (Model.Status == BookingStatus.Pending
+            || Model.Status == BookingStatus.Confirmed)
+        && Model.StartTime > now;
+
+    bool canConfirmOrReject = isOwner
+        && Model.Status == BookingStatus.Pending;
+
+    bool canComplete = isOwner
+        && Model.Status == BookingStatus.Confirmed
+        && Model.EndTime <= now;
+
+    var statusText = Model.Status switch
+    {
+        BookingStatus.Pending => "Chờ xác nhận",
+        BookingStatus.Confirmed => "Đã xác nhận",
+        BookingStatus.Cancelled => "Đã hủy",
+        BookingStatus.Rejected => "Đã từ chối",
+        BookingStatus.Completed => "Đã hoàn thành",
+        _ => "Không xác định"
+    };
+
+    var statusClass = Model.Status switch
+    {
+        BookingStatus.Pending => "bg-warning text-dark",
+        BookingStatus.Confirmed => "bg-primary",
+        BookingStatus.Cancelled => "bg-secondary",
+        BookingStatus.Rejected => "bg-danger",
+        BookingStatus.Completed => "bg-success",
+        _ => "bg-dark"
+    };
+}
+
+<div class="container py-4">
+
+    <h2 class="mb-4">
+        Chi tiết lịch đặt #@Model.Id
+    </h2>
+
+    @if (TempData["SuccessMessage"] is string successMessage)
+    {
+        <div class="alert alert-success" role="alert">
+            @successMessage
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] is string errorMessage)
+    {
+        <div class="alert alert-danger" role="alert">
+            @errorMessage
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-header">
+            Thông tin lịch đặt
+        </div>
+
+        <div class="card-body">
+            <dl class="row">
+
+                <dt class="col-sm-4">
+                    Mã lịch đặt
+                </dt>
+                <dd class="col-sm-8">
+                    #@Model.Id
+                </dd>
+
+                <dt class="col-sm-4">
+                    Dịch vụ
+                </dt>
+                <dd class="col-sm-8">
+                    @Model.ServiceName
+                </dd>
+
+                <dt class="col-sm-4">
+                    Cơ sở kinh doanh
+                </dt>
+                <dd class="col-sm-8">
+                    @Model.BusinessName
+                </dd>
+
+                @if (isOwner)
+                {
+                    <dt class="col-sm-4">
+                        Khách hàng
+                    </dt>
+                    <dd class="col-sm-8">
+                        @Model.CustomerName
+                    </dd>
+                }
+
+                <dt class="col-sm-4">
+                    Thời gian bắt đầu
+                </dt>
+                <dd class="col-sm-8">
+                    @(Model.StartTime
+                        .ToOffset(TimeSpan.FromHours(7))
+                        .ToString("dd/MM/yyyy HH:mm"))
+                </dd>
+
+                <dt class="col-sm-4">
+                    Thời gian kết thúc
+                </dt>
+                <dd class="col-sm-8">
+                    @(Model.EndTime
+                        .ToOffset(TimeSpan.FromHours(7))
+                        .ToString("dd/MM/yyyy HH:mm"))
+                </dd>
+
+                <dt class="col-sm-4">
+                    Giá dịch vụ
+                </dt>
+                <dd class="col-sm-8">
+                    @Model.PriceAtBooking.ToString("N0") VNĐ
+                </dd>
+
+                <dt class="col-sm-4">
+                    Trạng thái
+                </dt>
+                <dd class="col-sm-8">
+                    <span class="badge @statusClass">
+                        @statusText
+                    </span>
+                </dd>
+
+            </dl>
+
+            <hr />
+
+            <div class="d-flex flex-wrap gap-2">
+
+                <a asp-controller="Bookings"
+                   asp-action="@backAction"
+                   class="btn btn-outline-secondary">
+                    Quay lại danh sách
+                </a>
+
+                @if (canCancel)
+                {
+                    <form asp-controller="Bookings"
+                          asp-action="Cancel"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          asp-antiforgery="true"
+                          onsubmit="return confirm('Bạn có chắc chắn muốn hủy lịch đặt này?');">
+
+                        <button type="submit"
+                                class="btn btn-danger">
+                            Hủy lịch
+                        </button>
+                    </form>
+                }
+
+                @if (canConfirmOrReject)
+                {
+                    <form asp-controller="Bookings"
+                          asp-action="Confirm"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          asp-antiforgery="true"
+                          onsubmit="return confirm('Bạn muốn xác nhận lịch đặt này?');">
+
+                        <button type="submit"
+                                class="btn btn-success">
+                            Xác nhận
+                        </button>
+                    </form>
+
+                    <form asp-controller="Bookings"
+                          asp-action="Reject"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          asp-antiforgery="true"
+                          onsubmit="return confirm('Bạn có chắc chắn muốn từ chối lịch đặt này?');">
+
+                        <button type="submit"
+                                class="btn btn-danger">
+                            Từ chối
+                        </button>
+                    </form>
+                }
+
+                @if (canComplete)
+                {
+                    <form asp-controller="Bookings"
+                          asp-action="Complete"
+                          asp-route-id="@Model.Id"
+                          method="post"
+                          asp-antiforgery="true"
+                          onsubmit="return confirm('Bạn muốn đánh dấu lịch này là đã hoàn thành?');">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Hoàn thành
+                        </button>
+                    </form>
+                }
+
+            </div>
+
+            @if (!canCancel && !canConfirmOrReject && !canComplete)
+            {
+                <p class="text-muted mt-3 mb-0">
+                    Hiện không có thao tác chuyển trạng thái khả dụng.
+                </p>
+            }
+
+        </div>
+    </div>
+</div>

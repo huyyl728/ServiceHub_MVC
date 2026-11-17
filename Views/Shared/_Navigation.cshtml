@@ -51,8 +51,9 @@
         @if (HasAction("Account", "Logout", "POST"))
         {
             <li class="nav-item">
-                <form asp-controller="Account" asp-action="Logout" method="post" asp-antiforgery="true">
+                <form asp-controller="Account" asp-action="Logout" method="post" asp-antiforgery="true" data-prevent-repeat>
                     <button class="btn btn-outline-primary" type="submit">Đăng xuất</button>
+                    <p class="form-processing" data-processing-message role="status" hidden>Đang đăng xuất…</p>
                 </form>
             </li>
         }
