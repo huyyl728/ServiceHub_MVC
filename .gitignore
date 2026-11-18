@@ -486,3 +486,7 @@ TAI_KHOAN_SERVICEHUB_NOI_BO.txt
 *TEAM_ACCOUNTS_PRIVATE*
 *.private.env
 team-secrets*.txt
+
+# Local Development configuration and copies (only the placeholder example is tracked)
+appsettings.*.local*.json
+!appsettings.Development.local.example.json

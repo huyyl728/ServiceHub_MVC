@@ -21,11 +21,10 @@ public static class DemoDataSeeder
         if (!configuration.GetValue<bool>("SeedAccounts:SharedDemo:Enabled"))
             return;
 
-        using var scope = services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var db = services.GetRequiredService<ApplicationDbContext>();
+        var users = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-        var owner = await users.FindByEmailAsync("owner@servicehub.test")
+        var owner = await users.FindByEmailAsync(SharedDemoAccounts.Read(configuration).Single(a => a.Role == "Owner").Email)
             ?? throw new InvalidOperationException(
                 "Không tìm thấy Owner demo để khởi tạo dữ liệu cơ sở.");
 

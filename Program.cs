@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ServiceHubMVC.Data;
+using ServiceHubMVC.Configuration;
 using ServiceHubMVC.Models;
 using ServiceHubMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+DevelopmentConfiguration.AddInternalFile(builder.Configuration, builder.Environment, args);
 
 // 1. MVC
 builder.Services.AddControllersWithViews();
@@ -18,7 +20,7 @@ builder.Services.AddScoped<BookingStatusService>();
 var connectionString =
     builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Windows Development: ưu tiên SQL Server LocalDB nếu chưa thiết lập User Secrets.
+// Windows Development: dùng SQL Server LocalDB nếu chưa cấu hình kết nối.
 // macOS/Linux: cấu hình DefaultConnection tới SQL Server của máy (ví dụ Docker).
 if (string.IsNullOrWhiteSpace(connectionString) &&
     builder.Environment.IsDevelopment() &&
@@ -61,12 +63,12 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
-// Chỉ Development được tự áp dụng migrations; không tự thay đổi schema Production.
-if (app.Environment.IsDevelopment())
+await DevelopmentBootstrapper.InitializeAsync(app.Services, app.Configuration, app.Environment);
+
+if (!app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await db.Database.MigrateAsync();
+    await DbSeeder.InitializeAsync(scope.ServiceProvider);
 }
 
 // 5. Error Handling
@@ -92,18 +94,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
-await DbSeeder.InitializeAsync(app.Services);
-
-if (app.Environment.IsDevelopment())
-{
-    await DevAccountSeeder.InitializeAsync(
-        app.Services,
-        app.Configuration);
-
-    await DemoDataSeeder.InitializeAsync(
-        app.Services,
-        app.Configuration);
-}
 
 app.Run();
