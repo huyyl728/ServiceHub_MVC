@@ -11,6 +11,12 @@ public class BookingListItemViewModel
 
     public string BusinessName { get; set; } = string.Empty;
 
+    public string BusinessAddress { get; set; } = string.Empty;
+
+    public string? BusinessPhoneNumber { get; set; }
+
+    public string? CustomerPhoneNumber { get; set; }
+
     public string CustomerName { get; set; } = string.Empty;
 
     public DateTimeOffset StartTime { get; set; }

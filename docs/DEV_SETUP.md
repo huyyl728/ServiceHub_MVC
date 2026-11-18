@@ -58,6 +58,8 @@ dotnet run
 
 Trong **Development**, `Program.cs` tự gọi `Database.MigrateAsync()` trước khi seed role, tài khoản và 16 dịch vụ demo thuộc 4 cơ sở. Lần chạy sau không tạo trùng dữ liệu; lịch đặt thật không bị xóa.
 
+Migration `AddBusinessContactPhone` cũng đã được đưa lên Git: cột `Businesses.PhoneNumber` sẽ được bổ sung tự động. Owner cần vào sửa cơ sở cũ để nhập số liên hệ.
+
 Nếu đã đổi Model, **phải đưa migration mới lên Git** để đồng đội áp dụng tự động. Không sửa schema bằng tay trên từng máy.
 
 ## 4. Lưu ý dữ liệu và chia sẻ

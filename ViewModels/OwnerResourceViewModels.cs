@@ -11,6 +11,12 @@ public sealed class BusinessFormViewModel
     [Display(Name = "Địa chỉ"), Required(ErrorMessage = "Vui lòng nhập địa chỉ."), StringLength(255)]
     public string Address { get; set; } = string.Empty;
 
+    [Display(Name = "Số điện thoại liên hệ")]
+    [Required(ErrorMessage = "Vui lòng nhập số điện thoại cơ sở.")]
+    [Phone(ErrorMessage = "Số điện thoại không hợp lệ.")]
+    [StringLength(20)]
+    public string PhoneNumber { get; set; } = string.Empty;
+
     [Display(Name = "Mô tả"), StringLength(1000)]
     public string? Description { get; set; }
 }
