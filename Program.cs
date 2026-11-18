@@ -16,9 +16,23 @@ builder.Services.AddScoped<BookingStatusService>();
 
 // 2. Database
 var connectionString =
-    builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException(
-        "DefaultConnection is not configured.");
+    builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Windows Development: ưu tiên SQL Server LocalDB nếu chưa thiết lập User Secrets.
+// macOS/Linux: cấu hình DefaultConnection tới SQL Server của máy (ví dụ Docker).
+if (string.IsNullOrWhiteSpace(connectionString) &&
+    builder.Environment.IsDevelopment() &&
+    OperatingSystem.IsWindows())
+{
+    connectionString =
+        @"Server=(localdb)\MSSQLLocalDB;Database=ServiceHubDB;Trusted_Connection=True;TrustServerCertificate=True";
+}
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "Chưa cấu hình ConnectionStrings:DefaultConnection. Xem docs/DEV_SETUP.md.");
+}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -46,6 +60,14 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 var app = builder.Build();
+
+// Chỉ Development được tự áp dụng migrations; không tự thay đổi schema Production.
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
+}
 
 // 5. Error Handling
 if (!app.Environment.IsDevelopment())
@@ -76,6 +98,10 @@ await DbSeeder.InitializeAsync(app.Services);
 if (app.Environment.IsDevelopment())
 {
     await DevAccountSeeder.InitializeAsync(
+        app.Services,
+        app.Configuration);
+
+    await DemoDataSeeder.InitializeAsync(
         app.Services,
         app.Configuration);
 }

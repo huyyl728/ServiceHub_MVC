@@ -480,3 +480,9 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Hồ sơ tài khoản và cấu hình riêng của nhóm – tuyệt đối không commit
+TAI_KHOAN_SERVICEHUB_NOI_BO.txt
+*TEAM_ACCOUNTS_PRIVATE*
+*.private.env
+team-secrets*.txt
