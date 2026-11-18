@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ServiceHubMVC.Data;
+using ServiceHubMVC.Configuration;
 using ServiceHubMVC.Models;
 using ServiceHubMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+DevelopmentConfiguration.AddInternalFile(builder.Configuration, builder.Environment, args);
 
 // 1. MVC
 builder.Services.AddControllersWithViews();
@@ -16,9 +18,23 @@ builder.Services.AddScoped<BookingStatusService>();
 
 // 2. Database
 var connectionString =
-    builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException(
-        "DefaultConnection is not configured.");
+    builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Windows Development: dùng SQL Server LocalDB nếu chưa cấu hình kết nối.
+// macOS/Linux: cấu hình DefaultConnection tới SQL Server của máy (ví dụ Docker).
+if (string.IsNullOrWhiteSpace(connectionString) &&
+    builder.Environment.IsDevelopment() &&
+    OperatingSystem.IsWindows())
+{
+    connectionString =
+        @"Server=(localdb)\MSSQLLocalDB;Database=ServiceHubDB;Trusted_Connection=True;TrustServerCertificate=True";
+}
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "Chưa cấu hình ConnectionStrings:DefaultConnection. Xem docs/DEV_SETUP.md.");
+}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -47,6 +63,14 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
+await DevelopmentBootstrapper.InitializeAsync(app.Services, app.Configuration, app.Environment);
+
+if (!app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    await DbSeeder.InitializeAsync(scope.ServiceProvider);
+}
+
 // 5. Error Handling
 if (!app.Environment.IsDevelopment())
 {
@@ -70,14 +94,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
-await DbSeeder.InitializeAsync(app.Services);
-
-if (app.Environment.IsDevelopment())
-{
-    await DevAccountSeeder.InitializeAsync(
-        app.Services,
-        app.Configuration);
-}
 
 app.Run();

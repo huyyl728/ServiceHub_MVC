@@ -208,7 +208,10 @@ public class BookingsController : Controller
                 StartTime = b.StartTime,
                 EndTime = b.EndTime,
                 PriceAtBooking = b.PriceAtBooking,
-                Status = b.Status
+                Status = b.Status,
+                BusinessAddress = b.Service.Business.Address,
+                BusinessPhoneNumber = b.Service.Business.PhoneNumber,
+                CustomerPhoneNumber = ownerMode ? b.Customer.PhoneNumber : null
             })
             .FirstOrDefaultAsync();
 

@@ -38,7 +38,7 @@ public sealed class BusinessesController(ApplicationDbContext db, UserManager<Ap
         var ownerId = users.GetUserId(User);
         if (ownerId is null) return Forbid();
         if (!ModelState.IsValid) return View(model);
-        db.Businesses.Add(new Business { Name = model.Name.Trim(), Address = model.Address.Trim(), Description = model.Description?.Trim(), OwnerId = ownerId });
+        db.Businesses.Add(new Business { Name = model.Name.Trim(), Address = model.Address.Trim(), PhoneNumber = model.PhoneNumber.Trim(), Description = model.Description?.Trim(), OwnerId = ownerId });
         await db.SaveChangesAsync();
         TempData["Success"] = "Đã thêm cơ sở.";
         return RedirectToAction(nameof(Index));
@@ -50,7 +50,7 @@ public sealed class BusinessesController(ApplicationDbContext db, UserManager<Ap
         var business = await Owned().AsNoTracking().SingleOrDefaultAsync(b => b.Id == id);
         if (business is null) return NotFound();
         ViewData["ResourceId"] = id;
-        return View(new BusinessFormViewModel { Name = business.Name, Address = business.Address, Description = business.Description });
+        return View(new BusinessFormViewModel { Name = business.Name, Address = business.Address, PhoneNumber = business.PhoneNumber ?? "", Description = business.Description });
     }
 
     [HttpPost]
@@ -62,6 +62,7 @@ public sealed class BusinessesController(ApplicationDbContext db, UserManager<Ap
         if (!ModelState.IsValid) return View(model);
         business.Name = model.Name.Trim();
         business.Address = model.Address.Trim();
+        business.PhoneNumber = model.PhoneNumber.Trim();
         business.Description = model.Description?.Trim();
         await db.SaveChangesAsync();
         TempData["Success"] = "Đã cập nhật cơ sở.";

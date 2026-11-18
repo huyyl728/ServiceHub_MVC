@@ -7,9 +7,7 @@ public static class DbSeeder
     public static async Task InitializeAsync(
         IServiceProvider services)
     {
-        using var scope = services.CreateScope();
-
-        var roleManager = scope.ServiceProvider
+        var roleManager = services
             .GetRequiredService<RoleManager<IdentityRole>>();
 
         string[] roles =

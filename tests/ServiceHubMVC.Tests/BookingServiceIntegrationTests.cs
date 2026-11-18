@@ -18,16 +18,17 @@ public class BookingServiceIntegrationTests
         var password = Environment.GetEnvironmentVariable(
             "SERVICEHUB_TEST_SQL_PASSWORD");
 
-        Assert.False(string.IsNullOrWhiteSpace(password));
-
-        var connectionBuilder = new SqlConnectionStringBuilder
-        {
-            DataSource = "localhost,1433",
-            InitialCatalog = "ServiceHubDB_Test",
-            UserID = "sa",
-            Password = password,
-            TrustServerCertificate = true
-        };
+        var configuredConnection = Environment.GetEnvironmentVariable("SERVICEHUB_TEST_CONNECTION");
+        Assert.True(!string.IsNullOrWhiteSpace(configuredConnection) || !string.IsNullOrWhiteSpace(password),
+            "Set SERVICEHUB_TEST_CONNECTION to the isolated ServiceHubDB_Test database.");
+        var connectionBuilder = string.IsNullOrWhiteSpace(configuredConnection)
+            ? new SqlConnectionStringBuilder
+            {
+                DataSource = "localhost,1433", InitialCatalog = "ServiceHubDB_Test",
+                UserID = "sa", Password = password, TrustServerCertificate = true
+            }
+            : new SqlConnectionStringBuilder(configuredConnection);
+        Assert.Equal("ServiceHubDB_Test", connectionBuilder.InitialCatalog, ignoreCase: true);
 
         var services = new ServiceCollection();
 

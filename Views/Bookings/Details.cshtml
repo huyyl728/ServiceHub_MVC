@@ -93,6 +93,21 @@
                     @Model.BusinessName
                 </dd>
 
+                <dt class="col-sm-4">Địa chỉ cơ sở</dt>
+                <dd class="col-sm-8">@Model.BusinessAddress</dd>
+
+                <dt class="col-sm-4">Điện thoại cơ sở</dt>
+                <dd class="col-sm-8">
+                    @if (!string.IsNullOrWhiteSpace(Model.BusinessPhoneNumber))
+                    {
+                        <a href="tel:@Model.BusinessPhoneNumber">@Model.BusinessPhoneNumber</a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Chưa cập nhật</span>
+                    }
+                </dd>
+
                 @if (isOwner)
                 {
                     <dt class="col-sm-4">
@@ -100,6 +115,18 @@
                     </dt>
                     <dd class="col-sm-8">
                         @Model.CustomerName
+                    </dd>
+
+                    <dt class="col-sm-4">Điện thoại khách hàng</dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrWhiteSpace(Model.CustomerPhoneNumber))
+                        {
+                            <a href="tel:@Model.CustomerPhoneNumber">@Model.CustomerPhoneNumber</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Khách chưa cập nhật số điện thoại</span>
+                        }
                     </dd>
                 }
 

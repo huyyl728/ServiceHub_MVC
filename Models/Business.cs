@@ -14,6 +14,9 @@ public class Business
     [StringLength(255)]
     public string Address { get; set; } = string.Empty;
 
+    [StringLength(20)]
+    public string? PhoneNumber { get; set; }
+
     [StringLength(1000)]
     public string? Description { get; set; }
 

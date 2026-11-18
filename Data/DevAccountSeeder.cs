@@ -9,31 +9,24 @@ public static class DevAccountSeeder
         IServiceProvider services,
         IConfiguration configuration)
     {
-        using var scope = services.CreateScope();
-
-        var userManager = scope.ServiceProvider
+        var userManager = services
             .GetRequiredService<UserManager<ApplicationUser>>();
 
-        // Khởi tạo nhiều tài khoản Admin
-        foreach (var admin in configuration
-            .GetSection("SeedAccounts:Admins")
-            .GetChildren())
+        var accounts = SharedDemoAccounts.Read(configuration);
+        if (accounts.Length > 0)
         {
-            await CreateUserAsync(
-                userManager,
-                admin["Email"],
-                admin["Password"],
-                admin["FullName"] ?? "ServiceHub Admin",
-                "Admin");
+            await SharedDemoAccounts.ValidatePasswordsAsync(userManager, accounts);
+            foreach (var account in accounts)
+                await CreateUserAsync(userManager, account.Email, account.Password,
+                    account.FullName, account.Role, verifyPassword: true);
+            return; // Shared demo replaces legacy seed settings, avoiding extra accounts.
         }
 
-        // Khởi tạo tài khoản Owner
-        await CreateUserAsync(
-            userManager,
-            configuration["SeedAccounts:Owner:Email"],
-            configuration["SeedAccounts:Owner:Password"],
-            "ServiceHub Owner",
-            "Owner");
+        foreach (var admin in configuration.GetSection("SeedAccounts:Admins").GetChildren())
+            await CreateUserAsync(userManager, admin["Email"], admin["Password"],
+                admin["FullName"] ?? "ServiceHub Admin", "Admin");
+        await CreateUserAsync(userManager, configuration["SeedAccounts:Owner:Email"],
+            configuration["SeedAccounts:Owner:Password"], "ServiceHub Owner", "Owner");
     }
 
     private static async Task CreateUserAsync(
@@ -41,7 +34,8 @@ public static class DevAccountSeeder
         string? email,
         string? password,
         string fullName,
-        string role)
+        string role,
+        bool verifyPassword = false)
     {
         if (string.IsNullOrWhiteSpace(email) &&
             string.IsNullOrWhiteSpace(password))
@@ -61,12 +55,16 @@ public static class DevAccountSeeder
 
         if (existingUser != null)
         {
-            if (!await userManager.IsInRoleAsync(existingUser, role))
+            var roles = await userManager.GetRolesAsync(existingUser);
+            if (!roles.Contains(role) || (verifyPassword && roles.Count != 1))
             {
                 throw new InvalidOperationException(
                     $"Existing account does not have role {role}.");
             }
 
+            if (verifyPassword && !await userManager.CheckPasswordAsync(existingUser, password))
+                throw new InvalidOperationException(
+                    $"Mật khẩu demo {role} không khớp tài khoản hiện có. Dùng đúng file nội bộ hoặc database dev mới; không tự đặt lại mật khẩu.");
             return;
         }
 
