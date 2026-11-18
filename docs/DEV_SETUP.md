@@ -1,7 +1,8 @@
 # Clone sạch và chạy ServiceHub trên Mac / Windows
 
-Dành cho Development nội bộ. PR #27 **chưa merge vào main**. Dùng nhánh
-`feature/shared-dev-bootstrap`, **không dùng ZIP cũ** để kiểm thử PR này.
+Dành cho Development nội bộ. Thành viên mới dùng bản đã tích hợp trên
+`main`, **không dùng ZIP cũ**. Nhánh `feature/shared-dev-bootstrap` là nhánh
+phát triển của PR #27, không phải nhánh cần clone cho thiết lập mới.
 
 ## 1. Chuẩn bị một lần trên mỗi máy
 
@@ -14,17 +15,17 @@ Dành cho Development nội bộ. PR #27 **chưa merge vào main**. Dùng nhánh
   được Microsoft hỗ trợ. Xem [yêu cầu nền tảng SQL Server](https://learn.microsoft.com/en-us/sql/linux/install-upgrade/setup?view=sql-server-ver17). Không cần đổi code để đổi máy chủ: chỉ đổi file nội bộ.
 - Không cần cài `dotnet-ef` để chạy app: chương trình tự áp dụng migration đã commit.
 
-## 2. Clone đúng nhánh PR #27
+## 2. Clone bản tích hợp trên main
 
 Lệnh giống nhau trên Terminal macOS và PowerShell Windows; chọn thư mục mới:
 
 ```sh
-git clone --branch feature/shared-dev-bootstrap --single-branch https://github.com/huyyl728/ServiceHub_MVC.git ServiceHub_MVC-pr27
-cd ServiceHub_MVC-pr27
+git clone --branch main https://github.com/huyyl728/ServiceHub_MVC.git ServiceHub_MVC
+cd ServiceHub_MVC
 git branch --show-current
 ```
 
-Kết quả cuối phải là `feature/shared-dev-bootstrap`. Với bản clone đúng nhánh đang
+Kết quả cuối phải là `main`. Với bản clone đúng nhánh đang
 có, dùng `git pull --ff-only` sau khi đã lưu/commit các thay đổi riêng.
 Đừng chép source, `bin`, `obj`, `.git` hoặc database từ ZIP vào bản clone này.
 

@@ -7,11 +7,11 @@ Website đặt lịch và quản lý dịch vụ trực tuyến. Stack: ASP.NET 
 Hướng dẫn **cài đặt Mac/Windows, database tự migration, tài khoản demo và dữ liệu mẫu**:
 [docs/DEV_SETUP.md](docs/DEV_SETUP.md).
 
-**PR #27:** clone nhánh `feature/shared-dev-bootstrap`, không dùng ZIP cũ:
+**Thành viên mới:** clone bản đã tích hợp trên `main`, không dùng ZIP cũ:
 
 ```sh
-git clone --branch feature/shared-dev-bootstrap --single-branch https://github.com/huyyl728/ServiceHub_MVC.git ServiceHub_MVC-pr27
-cd ServiceHub_MVC-pr27
+git clone --branch main https://github.com/huyyl728/ServiceHub_MVC.git ServiceHub_MVC
+cd ServiceHub_MVC
 ```
 
 Nhận `appsettings.Development.local.json` từ trưởng nhóm, đặt cạnh `.csproj`,
