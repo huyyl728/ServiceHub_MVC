@@ -1,0 +1,88 @@
+
+@model ServiceHubMVC.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Tổng quan hệ thống";
+
+    var title = Model.IsAdmin
+        ? "Dashboard quản trị viên"
+        : "Dashboard chủ cơ sở";
+
+    var statistics = new[]
+    {
+        new { Label = "Cơ sở", Value = Model.BusinessCount },
+        new { Label = "Dịch vụ", Value = Model.ServiceCount },
+        new { Label = "Tổng lịch đặt", Value = Model.BookingCount },
+        new { Label = "Chờ xác nhận", Value = Model.PendingCount },
+        new { Label = "Đã xác nhận", Value = Model.ConfirmedCount },
+        new { Label = "Hoàn thành", Value = Model.CompletedCount },
+        new { Label = "Đã hủy", Value = Model.CancelledCount },
+        new { Label = "Từ chối", Value = Model.RejectedCount }
+    };
+}
+
+<div class="container py-4">
+    <h1 class="mb-2">@title</h1>
+    <p class="text-muted mb-4">
+        @(Model.IsAdmin
+            ? "Thống kê toàn bộ hệ thống ServiceHub."
+            : "Thống kê các cơ sở và lịch đặt thuộc quyền quản lý.")
+    </p>
+
+    <div class="row g-3 mb-4">
+        @foreach (var stat in statistics)
+        {
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <p class="text-muted mb-2">
+                            @stat.Label
+                        </p>
+                        <h2 class="fw-bold mb-0">
+                            @stat.Value
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header fw-bold">
+            Thống kê theo cơ sở
+        </div>
+
+        <div class="card-body">
+            @if (!Model.Businesses.Any())
+            {
+                <p class="text-muted mb-0">
+                    Chưa có cơ sở kinh doanh.
+                </p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>Cơ sở</th>
+                                <th>Số dịch vụ</th>
+                                <th>Số lịch đặt</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var business in Model.Businesses)
+                            {
+                                <tr>
+                                    <td>@business.Name</td>
+                                    <td>@business.ServiceCount</td>
+                                    <td>@business.BookingCount</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
