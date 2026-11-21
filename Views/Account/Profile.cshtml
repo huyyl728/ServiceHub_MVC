@@ -10,7 +10,7 @@
         {
             <div class="alert alert-success" role="status">@message</div>
         }
-        <form asp-controller="Account" asp-action="Profile" method="post" asp-antiforgery="true">
+        <form asp-controller="Account" asp-action="Profile" method="post" asp-antiforgery="true" data-prevent-repeat>
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
             <div class="mb-3">
                 <label class="form-label" for="accountEmail">Email</label>
@@ -28,6 +28,12 @@
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
             <button class="btn btn-primary" type="submit">Lưu thay đổi</button>
+            <p class="form-processing"
+   data-processing-message
+   role="status"
+   hidden>
+    Đang lưu thông tin...
+</p>
         </form>
         <hr />
         <form asp-controller="Account" asp-action="Logout" method="post" asp-antiforgery="true">

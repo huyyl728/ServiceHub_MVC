@@ -82,16 +82,15 @@
 
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label">
-                            Ngày đặt lịch
-                        </label>
-
-                        <input type="date"
-                               name="date"
-                               class="form-control"
-                               value="@(Model.Date?.ToString("yyyy-MM-dd"))" />
-                    </div>
-
+                     <label for="booking-date" class="form-label">
+                         Ngày đặt lịch
+                     </label>
+                     <input id="booking-date"
+                     type="date"
+                     name="date"
+                     class="form-control"
+                     value="@(Model.Date?.ToString("yyyy-MM-dd"))" />
+                </div>
                     <div class="col-md-4">
                         <label asp-for="Status" class="form-label">
                             Trạng thái
