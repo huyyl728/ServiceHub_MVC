@@ -9,11 +9,12 @@
 | Nhiệm vụ | S3-03 – Kiểm thử xác thực, phân quyền và quyền sở hữu lịch |
 | GitHub Issue | [#13](https://github.com/huyyl728/ServiceHub_MVC/issues/13) |
 | Người phụ trách | Bùi Quang Huy (`huybui330`) |
-| Ngày thực hiện | 18/11/2026 |
+| Thời gian kiểm thử | 18/11/2026 và 24/11/2026 |
 | Công cụ | Windows, .NET 10, SQL Server LocalDB, xUnit, Chrome, PowerShell |
 | Nhánh báo cáo và kiểm thử Authorization | `feature/sprint3-authorization-tests` |
-| Nhánh kiểm thử Booking tích hợp local | `test/sprint3-booking-integration` |
-| Tình trạng | **PARTIAL – Chưa đủ điều kiện đóng Issue #13** |
+| Nhánh kiểm thử Booking tích hợp local (18/11) | `test/sprint3-booking-integration` |
+| Nhánh bổ sung bằng chứng (24/11) | `feature/sprint3-issue13-evidence-20261124` |
+| Tình trạng | **PARTIAL – Chờ nghiệm thu các mục chưa có bằng chứng** |
 
 ### 1.1. Phiên bản và phạm vi đã kiểm thử
 
@@ -21,7 +22,7 @@
 - **Booking:** bản tích hợp **local** từ `main` tại commit `aef0a8f` và mã Booking Management của nhánh PR #22 (`f5e4323`); kiểm thử tại `http://127.0.0.1:5088`, database `ServiceHubMVC_BookingHttpTest`.
 - **xUnit Authorization:** project `tests/ServiceHubMVC.Authorization.Tests`, database riêng `ServiceHubMVC_AuthTest`.
 - **xUnit Booking Management:** project `tests/ServiceHubMVC.BookingManagement.Tests`, database riêng `ServiceHubMVC_BookingTest`.
-- **Tình trạng tích hợp GitHub:** PR #24 đã đưa mã Booking Management vào `main`; PR #22 đóng mà không merge trực tiếp vì nội dung đã được tích hợp bằng PR #24. Các kết quả HTTP trong tài liệu này được thực hiện trên **bản local**, **chưa phải kết quả chạy lại trên `main` sau PR #24**.
+- **Tình trạng tích hợp GitHub:** PR #24 đã đưa mã Booking Management vào `main`; PR #22 đóng mà không merge trực tiếp vì nội dung đã được tích hợp bằng PR #24. Kết quả ở mục 4–5 thuộc đợt kiểm thử local ngày 18/11; mục 6–8 tổng hợp kết quả của cả hai đợt và ghi rõ phạm vi. **Đợt kiểm thử ngày 24/11 sử dụng mã từ `main` tại commit `ea2e923`**, trên worktree riêng, với bằng chứng chi tiết ở mục 12. Không suy diễn các kết quả này sang commit mới hơn.
 
 ## 2. Mục tiêu kiểm thử
 
@@ -56,9 +57,11 @@ Dữ liệu Booking HTTP được tạo cho hai cơ sở, hai dịch vụ và ha
 | `#1` | Customer A | `Booking HTTP - Business A` | Owner A | Pending (`0`) |
 | `#2` | Customer B | `Booking HTTP - Business B` | Owner B | Pending (`0`) |
 
-Ban đầu có 4 tài khoản, 2 cơ sở, 2 dịch vụ và 2 lịch trong `ServiceHubMVC_BookingHttpTest`. Sau khi tạo Admin để kiểm thử, số tài khoản dự kiến là 5. **Không đưa mật khẩu, cookie, mã CSRF hoặc thông tin cá nhân thật vào tài liệu.**
+**Đợt 18/11:** Ban đầu có 4 tài khoản, 2 cơ sở, 2 dịch vụ và 2 lịch trong `ServiceHubMVC_BookingHttpTest`. Sau khi tạo Admin để kiểm thử, số tài khoản dự kiến là 5. **Đợt 24/11:** dữ liệu mới gồm Owner A, Owner B, hai Customer và ba Booking trong `ServiceHubMVC_Issue13_MainTest` (xem mục 12.3). Hai bộ dữ liệu này **độc lập**; không so sánh ID của các database như thể là một tập dữ liệu.
 
-## 4. Ma trận kiểm thử xác thực
+**Bảo mật:** Không đưa mật khẩu, cookie, mã CSRF hoặc thông tin cá nhân thật vào tài liệu.
+
+## 4. Ma trận kiểm thử xác thực (đợt 18/11)
 
 | Mã | Vai trò | Tình huống | Kết quả mong đợi | Kết quả thực tế / bằng chứng | Trạng thái |
 |---|---|---|---|---|---|
@@ -70,7 +73,7 @@ Ban đầu có 4 tài khoản, 2 cơ sở, 2 dịch vụ và 2 lịch trong `Ser
 | AUTH-06 | Customer | Đăng xuất | Phiên bị kết thúc | Đăng xuất thành công, truy cập lại Profile bị yêu cầu đăng nhập; đăng nhập lại thành công | **PASS** |
 | AUTH-07 | Guest | Gửi thêm `Role=Admin`, `IsAdmin=true` khi đăng ký | Chỉ có quyền Customer | `customer-d-test@example.test` vẫn có vai trò Customer trong SQL Server | **PASS** |
 
-## 5. Ma trận kiểm thử phân quyền và quyền sở hữu Booking
+## 5. Ma trận kiểm thử phân quyền và quyền sở hữu Booking (đợt 18/11)
 
 | Mã | Vai trò | Tình huống | Kết quả mong đợi | Kết quả thực tế / bằng chứng | Trạng thái |
 |---|---|---|---|---|---|
@@ -83,7 +86,7 @@ Ban đầu có 4 tài khoản, 2 cơ sở, 2 dịch vụ và 2 lịch trong `Ser
 | ROLE-07 | Customer A | POST hủy Booking B | Không thay đổi lịch B | HTTP cuối `404` sau chuyển hướng; SQL Booking `#2` vẫn `Pending (0)` | **PASS** |
 | ROLE-08 | Owner A | POST Confirm/Reject Booking B | Không thay đổi lịch B | Cả hai yêu cầu có HTTP cuối `404` sau chuyển hướng; SQL Booking `#2` vẫn `Pending (0)` | **PASS** |
 
-**Lưu ý về kết quả `404`:** Các bài POST trái quyền có chuyển hướng đến trang chi tiết bị chặn; mã `404` là phản hồi **cuối sau chuyển hướng**. Kết luận không cập nhật trái quyền dựa trên việc đối chiếu **SQL Server trước và sau yêu cầu**, không dựa riêng vào `404`.
+**Lưu ý về kết quả `404`:** Các bài POST trái quyền có chuyển hướng đến trang chi tiết bị chặn; mã `404` là phản hồi **cuối sau chuyển hướng**, không phải mã trạng thái POST ban đầu. Kết luận không cập nhật trái quyền dựa trên việc đối chiếu **SQL Server trước và sau yêu cầu**, không dựa riêng vào `404`.
 
 ### 5.1. Kiểm thử sai vai trò bổ sung
 
@@ -108,12 +111,12 @@ Tài khoản Admin chỉ mang vai trò `Admin`, đã đăng xuất và đăng nh
 
 **Giới hạn:** Năm bài Admin chỉ kiểm thử phân quyền ở các endpoint hiện có; **không chứng minh đã có hoặc đã nghiệm thu trang quản trị Admin**.
 
-## 6. Ma trận kiểm thử CSRF, dữ liệu thừa và API
+## 6. Ma trận kiểm thử CSRF, dữ liệu thừa và API (cập nhật 24/11)
 
 | Mã | Tình huống | Kết quả mong đợi | Kết quả thực tế / phạm vi | Trạng thái |
 |---|---|---|---|---|
-| SEC-01 | POST chuyển trạng thái Booking **thiếu** antiforgery token | Từ chối yêu cầu | Đã kiểm tra thiếu token tại POST Login và POST Profile (`400`); **chưa thử HTTP riêng trên POST Booking** | **CHƯA CHẠY (Booking)** |
-| SEC-02 | POST chuyển trạng thái Booking với token **sai** | Từ chối yêu cầu | POST Login với token giả trả `400`; **chưa thử HTTP riêng trên POST Booking** | **CHƯA CHẠY (Booking)** |
+| SEC-01 | POST chuyển trạng thái Booking **thiếu** antiforgery token | Từ chối yêu cầu | **24/11:** Owner A POST `/Bookings/Confirm/1` không gửi token, HTTP `400`; SQL Booking #1 vẫn Pending (`0`) | **PASS** |
+| SEC-02 | POST chuyển trạng thái Booking với token **sai** | Từ chối yêu cầu | **24/11:** Owner A POST `/Bookings/Confirm/1` với token giả, HTTP `400`; SQL Booking #1 vẫn Pending (`0`) | **PASS** |
 | SEC-03 | Gửi trường thừa nhằm sửa quyền hoặc dữ liệu người khác | Không được nâng quyền/ghi chéo | Đăng ký kèm `Role=Admin`, `IsAdmin=true` vẫn là Customer; Profile gửi `UserId` của người khác chỉ cập nhật hồ sơ đang đăng nhập | **PASS** |
 | API-01 | Gọi API bảo vệ khi chưa đăng nhập | Mã `401`, JSON đúng hợp đồng | Chưa có kết quả thử API thật của Issue #10; không dùng redirect MVC thay cho mã API | **BLOCKED** |
 | API-02 | Gọi API khi không đủ quyền | `403` hoặc mã phù hợp hợp đồng, không lộ dữ liệu | Chưa có kết quả thử API thật của Issue #10 | **BLOCKED** |
@@ -148,7 +151,7 @@ Tài khoản Admin chỉ mang vai trò `Admin`, đã đăng xuất và đăng nh
 | Owner A xác nhận/từ chối lịch B trái quyền | SQL Booking B giữ nguyên Pending (`0`) | **PASS** |
 | Customer POST Confirm / Owner POST Cancel sai vai trò | Bị từ chối; SQL hai lịch giữ nguyên Pending (`0`) | **PASS** |
 | Thử hai yêu cầu HTTP thực sự cạnh tranh / hai kết nối SQL giao nhau | Chưa có bằng chứng tái hiện tranh chấp độc lập, lặp lại trên tích hợp | **CHƯA CHẠY / CẦN BỔ SUNG** |
-| Chạy lại đầy đủ trên `main` mới nhất sau PR #24 | Chưa ghi nhận kết quả trên phiên bản đó | **CHƯA CHẠY** |
+| Chạy lại xUnit và các luồng Booking trọng yếu trên mã từ `main` commit `ea2e923` | 24/11: Authorization 4/4, Booking Management 13/13; quyền sở hữu và CSRF HTTP đạt kỳ vọng (mục 12) | **PASS (phạm vi đã chạy)** |
 
 Không lấy 13/13 xUnit thay thế cho kết quả kiểm thử đồng thời HTTP thực tế.
 
@@ -167,10 +170,10 @@ Không lấy 13/13 xUnit thay thế cho kết quả kiểm thử đồng thời 
 | Customer/Owner truy cập sai vai trò | 4/4 GET bị từ chối | **PASS** |
 | Customer/Owner POST sai vai trò | 2/2 bị từ chối, SQL không đổi | **PASS** |
 | Admin kiểm thử trên endpoint hiện có | 5/5 đúng kỳ vọng | **PASS** |
-| CSRF HTTP trên các POST Booking | Chưa kiểm thử riêng cả thiếu và sai token | **CHƯA CHẠY** |
+| CSRF HTTP trên POST Booking | 24/11: thiếu token và token giả đều HTTP `400`; SQL không đổi | **PASS (2/2)** |
 | API JSON / mã lỗi chuẩn | Chờ API thực tế của Issue #10 | **BLOCKED** |
 | Kiểm thử cạnh tranh HTTP/SQL thực tế | Chưa hoàn tất | **CHƯA CHẠY** |
-| Chạy lại trên `main` đã merge PR #24 | Chưa có bằng chứng | **CHƯA CHẠY** |
+| Chạy lại trên mã `main` commit `ea2e923` | 24/11: xUnit 17/17; kiểm thử lại các luồng ROLE-05–08 và SEC-01–02 | **PASS (phạm vi đã chạy)** |
 
 ### 8.2. Ghi chú về kết quả bất thường
 
@@ -182,7 +185,7 @@ Lần đầu Owner B xem Booking B từng ghi nhận FAIL. Sau khi mở phiên C
 - Kết quả `curl.exe` xác nhận Guest nhận `302` với `Location` về Login.
 - Ảnh Chrome xác nhận danh sách/chi tiết lịch của Customer và Owner.
 - Console Chrome xác nhận các yêu cầu POST trái quyền bị chuyển hướng; SQL xác nhận trạng thái Booking không đổi.
-- Truy vấn SQL Server xác nhận `#1` và `#2` vẫn `Pending (0)` sau các lần thử cập nhật trái quyền.
+- Truy vấn SQL Server ngày 18/11 xác nhận Booking `#1` và `#2` vẫn Pending (`0`) trong `ServiceHubMVC_BookingHttpTest`; đợt 24/11 xác nhận cả Booking `#1`, `#2`, `#3` đều Pending (`0`) trong `ServiceHubMVC_Issue13_MainTest`.
 - Kết quả Admin gồm năm trường hợp do người kiểm thử xác nhận.
 
 **Lưu ý bằng chứng:** Tài liệu này mô tả các log và ảnh đã xem trong quá trình kiểm thử. Nếu nộp ảnh chụp màn hình trong repository/PR, chỉ đính kèm tệp thực sự có và đã xóa/che mọi thông tin nhạy cảm; không tự ghi tên tệp bằng chứng chưa được lưu.
@@ -196,11 +199,13 @@ Lần đầu Owner B xem Booking B từng ghi nhận FAIL. Sau khi mở phiên C
 - [x] Đã kiểm tra đăng xuất, đăng nhập và Open Redirect.
 - [x] Có bằng chứng CSRF tại Account/Profile.
 - [x] Có kiểm thử xUnit trên SQL Server và HTTP quyền sở hữu lịch.
-- [ ] Hoàn thiện kiểm thử HTTP CSRF thiếu/sai token trên POST Booking.
+- [x] Hoàn thành kiểm thử HTTP CSRF thiếu/sai token trên POST Booking (`400`, SQL không đổi, ngày 24/11).
 - [ ] Kiểm thử API JSON đúng mã lỗi khi Issue #10 sẵn sàng.
 - [ ] Bổ sung kiểm thử đồng thời có cạnh tranh thực tế.
-- [ ] Chạy lại build, xUnit và các luồng quan trọng trên `main` mới nhất sau khi tích hợp.
-- [ ] Tạo PR của `feature/sprint3-authorization-tests` liên kết Issue #13 và được review.
+- [x] Chạy lại build, hai bộ xUnit và các luồng Booking trọng yếu trên mã lấy từ `main` tại commit `ea2e923` (24/11).
+- [ ] Nếu `main` có commit mới sau `ea2e923`, đối chiếu thay đổi và quyết định phạm vi kiểm thử lại trước nghiệm thu cuối.
+- [x] Đã có PR #26 của `feature/sprint3-authorization-tests` liên kết Issue #13.
+- [ ] Tạo PR bổ sung bằng chứng từ `feature/sprint3-issue13-evidence-20261124` để trưởng nhóm review; chưa xác nhận review/merge.
 
 **Không đóng Issue khi còn các hạng mục bắt buộc BLOCKED hoặc CHƯA CHẠY.**
 
@@ -208,9 +213,9 @@ Lần đầu Owner B xem Booking B từng ghi nhận FAIL. Sau khi mở phiên C
 
 - Phụ thuộc vào các module Account/Identity, Business/Services, Booking Management và API (Issue #10).
 - Chức năng Admin riêng chưa được nghiệm thu; không suy diễn năm bài ADM thành bằng chứng về toàn bộ trang Admin.
-- `ServiceHubMVC_BookingHttpTest`, `ServiceHubMVC_AccountHttpTest`, `ServiceHubMVC_AuthTest`, `ServiceHubMVC_BookingTest` là database phục vụ thử nghiệm; không sử dụng database sản xuất.
+- `ServiceHubMVC_BookingHttpTest`, `ServiceHubMVC_AccountHttpTest`, `ServiceHubMVC_Issue13_MainTest`, `ServiceHubMVC_AuthTest`, `ServiceHubMVC_BookingTest` là database phục vụ thử nghiệm; không sử dụng database sản xuất.
 - Không đẩy mật khẩu, chuỗi kết nối có bí mật, cookie, antiforgery token, database local, `bin/` hoặc `obj/` lên GitHub.
-- Các thao tác kiểm thử trực tiếp đã chạy trên local; không tự nhận đã được xác minh trên `main` sau khi merge PR #24.
+- Ngày 24/11 đã chạy lại trên một worktree dựa trên `main` commit `ea2e923`. Đây là kiểm thử local trên mã lấy từ `main`, không chứng minh tự động cho những commit mới hơn hoặc môi trường triển khai khác.
 
 ## 11. Kết luận và bàn giao
 
@@ -218,6 +223,84 @@ Trong phạm vi các ca đã chạy, ServiceHub MVC **không bộc lộ quyền 
 
 **Bộ kiểm thử tự động đạt 4/4 Authorization và 13/13 Booking Management.** Các tình huống POST trái quyền được đối chiếu thêm trong SQL Server, không chỉ dựa vào mã phản hồi cuối cùng trên trình duyệt.
 
-**Trạng thái cuối: PARTIAL – Chưa đóng Issue #13.** Những hạng mục còn thiếu được ghi ở mục 9 để trưởng nhóm review, phân công bổ sung và nghiệm thu trên phiên bản tích hợp cuối cùng.
+**Trạng thái báo cáo: PARTIAL – Chưa đủ bằng chứng để kết luận hoàn tất mọi tiêu chí của Issue #13.** Những hạng mục còn thiếu được ghi ở mục 9; đợt kiểm thử lại ngày 24/11 đã hoàn thành ROLE-05–08, SEC-01–02 và 17/17 xUnit (xem mục 12).
 
-**Liên kết:** [Issue #13](https://github.com/huyyl728/ServiceHub_MVC/issues/13) · [PR #24 đã merge](https://github.com/huyyl728/ServiceHub_MVC/pull/24) · [PR #22 đã đóng, không merge trực tiếp](https://github.com/huyyl728/ServiceHub_MVC/pull/22)
+**Liên kết:** [Issue #13](https://github.com/huyyl728/ServiceHub_MVC/issues/13) · [PR #26 – báo cáo gốc](https://github.com/huyyl728/ServiceHub_MVC/pull/26) · [PR #24 – tích hợp Booking Management](https://github.com/huyyl728/ServiceHub_MVC/pull/24) · [PR #22 – đã đóng, không merge trực tiếp](https://github.com/huyyl728/ServiceHub_MVC/pull/22)
+
+## 12. Kiểm thử lại trên main ngày 24/11/2026
+
+### 12.1. Môi trường kiểm thử
+
+- Commit nền của worktree: `ea2e923` (mã lấy từ `origin/main` ngày 24/11/2026)
+- Nhánh kiểm thử: `feature/sprint3-issue13-evidence-20261124`
+- Hệ điều hành: Windows
+- Framework: ASP.NET Core 10
+- Database HTTP: `ServiceHubMVC_Issue13_MainTest`
+- Database xUnit: `ServiceHubMVC_AuthTest`, `ServiceHubMVC_BookingTest`
+- Website: `http://127.0.0.1:5093`
+- Ghi chú: Đợt này dùng các tài khoản/dữ liệu độc lập với đợt 18/11; các Booking trong phần 12 thuộc database `ServiceHubMVC_Issue13_MainTest`.
+
+### 12.2. Kết quả kiểm thử tự động
+
+| Bộ kiểm thử | Tổng số | PASS | FAIL | Skipped |
+|---|---:|---:|---:|---:|
+| Authorization | 4 | 4 | 0 | 0 |
+| Booking Management | 13 | 13 | 0 | 0 |
+| **Tổng cộng** | **17** | **17** | **0** | **0** |
+
+Kết luận: 17/17 bài xUnit đạt yêu cầu trên phiên bản được kiểm thử.
+
+Database `ServiceHubMVC_BookingTest` được cập nhật migration trước khi chạy lại. Lượt trước có 5 FAIL; sau cập nhật đạt 13/13 PASS. Kết quả không đồng nghĩa đã kiểm thử đồng thời qua HTTP.
+
+### 12.3. Kiểm thử phân quyền HTTP
+
+| Mã | Tình huống | Kết quả thực tế | Trạng thái |
+|---|---|---|---|
+| ROLE-01 | Guest truy cập Booking | HTTP 302 đến Login | PASS |
+| ROLE-02 | Customer truy cập trang Owner | Access Denied | PASS |
+| ROLE-05 | Owner B xem danh sách của mình; Owner A xem danh sách và cố mở Booking #3 | Owner B chỉ thấy #3; Owner A chỉ thấy #1, #2; GET `/Bookings/OwnerDetails/3` trả `404` với Owner A | PASS (phạm vi đã thử) |
+| ROLE-06 | Hai Customer xem chéo Booking | 4/4 trường hợp đúng quyền | PASS |
+| ROLE-07 | Customer 1/2 lần lượt POST Cancel Booking của tài khoản kia | HTTP cuối `404` sau chuyển hướng; SQL cả hai Booking vẫn Pending (`0`) | PASS |
+| ROLE-08 | Owner A POST Confirm/Reject Booking #3 thuộc Owner B | HTTP cuối `404` sau chuyển hướng; SQL Booking #3 vẫn Pending (`0`) sau từng thao tác | PASS |
+
+Dữ liệu kiểm thử:
+
+- Booking #1: `customer1@servicehub.test`, thuộc cơ sở Owner A (`owner@servicehub.test`).
+- Booking #2: `customer2@servicehub.test`, thuộc cơ sở Owner A (`owner@servicehub.test`).
+- Booking #3: `customer2@servicehub.test`, thuộc `ISSUE13 Business B`, Owner B (`owner-b-issue13@example.test`).
+
+Các POST trái quyền đã dùng CSRF token hợp lệ của phiên đăng nhập hiện tại, nhưng cố truy cập Booking của tài khoản/cơ sở khác. Với `fetch` theo chuyển hướng, HTTP cuối `404` là phản hồi GET sau chuyển hướng, **không phải bằng chứng rằng POST trực tiếp trả `404`**. Kết quả được đối chiếu thêm bằng SQL Server.
+
+### 12.4. Kiểm thử CSRF trên Booking
+
+| Mã | Tình huống | HTTP | SQL | Trạng thái |
+|---|---|---|---|---|
+| SEC-01 | POST Confirm thiếu CSRF token | 400 | Không đổi | PASS |
+| SEC-02 | POST Confirm với CSRF token giả | 400 | Không đổi | PASS |
+
+Sau các lượt kiểm thử:
+
+| Booking ID | Status |
+|---|---|
+| 1 | Pending (0) |
+| 2 | Pending (0) |
+| 3 | Pending (0) |
+
+### 12.5. Phạm vi và hạn chế
+
+- Các trường hợp quyền sở hữu Booking và CSRF đã được kiểm thử lại trên commit `ea2e923`.
+- Kiểm thử API JSON của Issue #10 chưa có bằng chứng HTTP để đánh dấu PASS.
+- Chưa có bằng chứng tái hiện đồng thời hai yêu cầu HTTP cạnh tranh.
+- Chưa kiểm thử lại đầy đủ các chức năng Admin trên commit này; năm ca Admin ở mục 5.2 thuộc đợt 18/11.
+- Ảnh và log được quan sát tại máy Windows trong quá trình kiểm thử; chưa xác nhận đã lưu các ảnh làm tệp minh chứng và đưa vào PR.
+- Không suy diễn các kết quả từ commit này sang các commit mới hơn.
+
+### 12.6. Kết luận
+
+Kết quả kiểm thử lại xác nhận các endpoint Booking đã kiểm tra không cho phép Customer hoặc Owner đọc, hủy, xác nhận hay từ chối lịch thuộc quyền sở hữu của người khác.
+
+Hai trường hợp CSRF đều bị từ chối với HTTP 400.
+
+Bộ kiểm thử tự động đạt **17/17 PASS**.
+
+Trạng thái báo cáo cho Issue #13: **PARTIAL**. Các mục API JSON, cạnh tranh HTTP/SQL thực tế và việc nghiệm thu PR còn chưa có đủ bằng chứng; đối chiếu mục 9. Không tự đánh dấu Issue đã hoàn thành.
