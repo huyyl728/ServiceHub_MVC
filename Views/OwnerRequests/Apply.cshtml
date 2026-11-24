@@ -1,0 +1,93 @@
+@model ServiceHubMVC.ViewModels.OwnerRequestFormViewModel
+
+@{
+    ViewData["Title"] = "Đăng ký làm Chủ cơ sở";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+
+                <h2 class="fw-bold mb-2">
+                    Trở thành đối tác ServiceHub
+                </h2>
+
+                <p class="text-muted mb-4">
+                    Đăng ký làm chủ cơ sở để quản lý
+                    dịch vụ và lịch đặt của bạn.
+                </p>
+
+                <form asp-action="Apply"
+                      method="post"
+                      asp-antiforgery="true"
+                      data-prevent-repeat>
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="BusinessName"
+                               class="form-label"></label>
+
+                        <input asp-for="BusinessName"
+                               class="form-control"
+                               placeholder="Nhập tên cơ sở" />
+
+                        <span asp-validation-for="BusinessName"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="BusinessAddress"
+                               class="form-label"></label>
+
+                        <input asp-for="BusinessAddress"
+                               class="form-control"
+                               placeholder="Nhập địa chỉ cơ sở" />
+
+                        <span asp-validation-for="BusinessAddress"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Reason"
+                               class="form-label"></label>
+
+                        <textarea asp-for="Reason"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Giới thiệu về cơ sở và dịch vụ của bạn">
+                        </textarea>
+
+                        <span asp-validation-for="Reason"
+                              class="text-danger"></span>
+                    </div>
+
+                    <div class="alert alert-info">
+                        Yêu cầu của bạn sẽ được quản trị viên
+                        kiểm tra trước khi cấp quyền Owner.
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-primary w-100">
+                        Gửi yêu cầu đăng ký
+                    </button>
+
+                    <p data-processing-message
+                       role="status"
+                       class="form-processing"
+                       hidden>
+                        Đang gửi yêu cầu...
+                    </p>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
