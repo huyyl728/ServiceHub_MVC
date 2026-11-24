@@ -14,18 +14,18 @@ Liên kết [issue #14](https://github.com/huyyl728/ServiceHub_MVC/issues/14). *
 
 ## Ma trận ca cần chạy và ghi bằng chứng
 
-| Mã | Thực hiện trên dữ liệu thử | Kết quả mong đợi | Trạng thái |
-| --- | --- | --- | --- |
-| D01 | Chạy script hai lần; truy vấn dịch vụ `[S3-04]`; khởi động lại ứng dụng, tải lại trang | Đúng 13 dịch vụ cùng bộ lọc, ID/giá/thời lượng giữ nguyên | CHƯA CHẠY |
-| B01 | Owner tạo cơ sở và dịch vụ mới; xem chi tiết, sửa tên/giá, tải lại | Dữ liệu mới đúng trong SQL; Owner thấy thay đổi sau tải lại | CHƯA CHẠY |
-| B02 | Tạo/sửa cơ sở, dịch vụ với tên rỗng/quá dài, giá âm, thời lượng 0 | Form báo lỗi, không tạo/cập nhật bản ghi | CHƯA CHẠY |
-| B03 | Xóa dịch vụ chưa có lịch; xóa cơ sở chưa có dịch vụ | Xóa thành công, bản ghi khác giữ nguyên | CHƯA CHẠY |
-| B04 | Customer đặt lịch tương lai cho một dịch vụ thử; Owner cố xóa dịch vụ và cơ sở chứa dịch vụ | Báo ràng buộc, lịch và dữ liệu lịch sử còn nguyên | CHƯA CHẠY |
-| S01 | Mở `/Services?keyword=Cầu%20lông%20mẫu&category=Thể%20thao&page=1` rồi `page=2` | Trang 1 có 12, trang 2 có 1; bộ lọc còn trên link/phần nhập | CHƯA CHẠY |
-| S02 | Mở cùng URL với `page=999`, `page=0`, `page=-1` | Trang được kẹp 2, 1, 1; không lỗi và không mất bộ lọc | CHƯA CHẠY |
-| S03 | Tìm `keyword=khong-co-s3-04`, lọc `category=khong-co` | Hiện trạng thái rỗng; không hiện dịch vụ lạ | CHƯA CHẠY |
-| S04 | Tạm ngừng một dịch vụ, rồi cơ sở; tìm kiếm, xem URL chi tiết và thử đặt lịch mới; sau đó mở lại | Tài nguyên ngừng hoạt động biến khỏi danh sách, không xem/đặt lịch mới; lịch cũ giữ nguyên; mở lại xuất hiện | CHƯA CHẠY |
-| A01 | Owner 2 đổi `id`/`businessId` trên URL GET và gửi form POST sửa/xóa/trạng thái của Owner 1 | Trả từ chối/404, không thay đổi bản ghi; kiểm tra kết quả #13 cùng commit | BLOCKED: cần Owner 2 |
+| Mã  | Thực hiện trên dữ liệu thử                                                                      | Kết quả mong đợi                                                                                             | Trạng thái           |
+| --- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------------- |
+| D01 | Chạy script hai lần; truy vấn dịch vụ `[S3-04]`; khởi động lại ứng dụng, tải lại trang          | Đúng 13 dịch vụ cùng bộ lọc, ID/giá/thời lượng giữ nguyên                                                    | PASS                 |
+| B01 | Owner tạo cơ sở và dịch vụ mới; xem chi tiết, sửa tên/giá, tải lại                              | Dữ liệu mới đúng trong SQL; Owner thấy thay đổi sau tải lại                                                  | PASS                 |
+| B02 | Tạo/sửa cơ sở, dịch vụ với tên rỗng/quá dài, giá âm, thời lượng 0                               | Form báo lỗi, không tạo/cập nhật bản ghi                                                                     | PASS                 |
+| B03 | Xóa dịch vụ chưa có lịch; xóa cơ sở chưa có dịch vụ                                             | Xóa thành công, bản ghi khác giữ nguyên                                                                      | PASS                 |
+| B04 | Customer đặt lịch tương lai cho một dịch vụ thử; Owner cố xóa dịch vụ và cơ sở chứa dịch vụ     | Báo ràng buộc, lịch và dữ liệu lịch sử còn nguyên                                                            | PASS                 |
+| S01 | Mở `/Services?keyword=Cầu%20lông%20mẫu&category=Thể%20thao&page=1` rồi `page=2`                 | Trang 1 có 12, trang 2 có 1; bộ lọc còn trên link/phần nhập                                                  | PASS                 |
+| S02 | Mở cùng URL với `page=999`, `page=0`, `page=-1`                                                 | Trang được kẹp 2, 1, 1; không lỗi và không mất bộ lọc                                                        | PASS                 |
+| S03 | Tìm `keyword=khong-co-s3-04`, lọc `category=khong-co`                                           | Hiện trạng thái rỗng; không hiện dịch vụ lạ                                                                  | PASS                 |
+| S04 | Tạm ngừng một dịch vụ, rồi cơ sở; tìm kiếm, xem URL chi tiết và thử đặt lịch mới; sau đó mở lại | Tài nguyên ngừng hoạt động biến khỏi danh sách, không xem/đặt lịch mới; lịch cũ giữ nguyên; mở lại xuất hiện | PASS                 |
+| A01 | Owner 2 đổi `id`/`businessId` trên URL GET và gửi form POST sửa/xóa/trạng thái của Owner 1      | Trả từ chối/404, không thay đổi bản ghi; kiểm tra kết quả #13 cùng commit                                    | BLOCKED: cần Owner 2 |
 
 **Lưu ý:** URL chi tiết tài nguyên không hoạt động có thể trả trang 404; ghi đúng HTTP và thông báo thực tế. Khi thử B04, dùng dịch vụ riêng ngoài 13 dịch vụ của ca phân trang để không làm thay đổi số liệu trang. Khi tạm ngừng một dịch vụ trong S04, kiểm tra lại S01 sau khi mở lại. Nếu khác mong đợi, ghi FAIL và issue xử lý; không sửa dữ liệu trực tiếp để che lỗi.
 
@@ -54,8 +54,8 @@ Không đưa tên/email khách hàng, cookie, token, mật khẩu hoặc chuỗi
 
 ## Nhật ký kết quả (điền sau khi chạy)
 
-| Mã ca | Người chạy, giờ Việt Nam | OS / .NET / SQL | Commit + database thử | Kết quả thực tế, số hàng SQL | PASS / FAIL / BLOCKED | Ảnh/log/issue và người sửa |
-| --- | --- | --- | --- | --- | --- | --- |
-| D01–A01 | Chưa chạy | Chưa ghi | Chưa ghi | Chưa có bằng chứng thực tế | CHƯA CHẠY | Chưa có |
+| Mã ca   | Người chạy, giờ Việt Nam | OS / .NET / SQL | Commit + database thử | Kết quả thực tế, số hàng SQL | PASS / FAIL / BLOCKED | Ảnh/log/issue và người sửa |
+| ------- | ------------------------ | --------------- | --------------------- | ---------------------------- | --------------------- | -------------------------- |
+| D01–A01 | Chưa chạy                | Chưa ghi        | Chưa ghi              | Chưa có bằng chứng thực tế   | CHƯA CHẠY             | Chưa có                    |
 
 Tổng hợp kết quả thật và liên kết tài liệu này vào [PR #30 cho #16](https://github.com/huyyl728/ServiceHub_MVC/pull/30) sau khi nhóm chạy; chỉ nhóm trưởng mới chốt #15 và nghiệm thu cuối.
