@@ -7,17 +7,43 @@
 - Chống gửi lặp ở form POST đặt lịch và đăng xuất qua thuộc tính data-prevent-repeat. Khi validation hủy submit hoặc quay lại từ bộ nhớ đệm, form được mở khóa. Không thay thế xác thực, chống giả mạo hoặc chống trùng ở máy chủ.
 - Các module về sau có thể dùng data-prevent-repeat và phần tử data-processing-message cho form POST điều hướng thông thường; không áp dụng cho form AJAX.
 
-## Bảng nghiệm thu (điền kết quả thật)
+## Kết quả nghiệm thu giao diện
 
-| Trang/ca kiểm tra | 375px | 1366px | Bằng chứng |
-| --- | --- | --- | --- |
-| Trang chủ, menu mở/đóng, quyền riêng tư | Chờ kiểm tra | Chờ kiểm tra | Ảnh màn hình |
-| Đăng ký/đăng nhập/hồ sơ/đăng xuất | Bị chặn #3 | Bị chặn #3 | Chờ tích hợp |
-| Quản lý cơ sở/dịch vụ | Bị chặn #5 | Bị chặn #5 | Chờ tích hợp |
-| Danh sách, lọc, phân trang, chi tiết dịch vụ | Bị chặn #6 | Bị chặn #6 | Chờ tích hợp |
-| Đặt lịch hợp lệ, lỗi trùng, giữ ngày giờ, gửi lặp | Bị chặn #7/#8 | Bị chặn #7/#8 | Chờ tích hợp |
-| Danh sách lịch đặt | Bị chặn #9 | Bị chặn #9 | Chờ tích hợp |
-| Bảng tổng quan | Bị chặn #11 | Bị chặn #11 | Chờ tích hợp |
+Commit kiểm thử: 5f8cd94
+Môi trường: macOS, ASP.NET Core 10, SQL Server
+Người kiểm thử: Đỗ Thành Huy
+
+| Màn hình                  | 375px | 1366px |
+| ------------------------- | ----- | ------ |
+| Trang chủ và menu         | PASS  |
+| Đăng nhập, đăng ký, hồ sơ | PASS  |
+| Tìm kiếm và xem dịch vụ   | PASS  |
+| Đặt lịch                  | PASS  |
+| Xem và quản lý lịch       | PASS  |
+| Quản lý cơ sở, dịch vụ    | PASS  |
+| Dashboard Owner/Admin     | PASS  |
+
+## Những file đã thay đổi
+
+- Views/Account/Login.cshtml:
+  Bổ sung chống gửi biểu mẫu lặp và thông báo đang đăng nhập.
+- Views/Account/Register.cshtml:
+  Bổ sung thông báo xử lý khi tạo tài khoản.
+- Views/Account/Profile.cshtml:
+  Bổ sung thông báo khi lưu hồ sơ.
+- Views/Bookings/Index.cshtml:
+  Liên kết nhãn và trường lọc ngày.
+
+## Kết luận
+
+Các thay đổi về giao diện đã được tích hợp
+trên nhánh feature/sprint3-ui-final.
+
+Kết quả nghiệm thu:
+[Điền sau khi đối chiếu các ca kiểm thử thực tế]
+
+Các lỗi còn tồn tại:
+[Không có / mô tả lỗi phát hiện]
 
 ## Cách kiểm tra
 
