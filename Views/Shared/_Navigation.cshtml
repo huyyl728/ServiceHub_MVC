@@ -27,6 +27,19 @@
     {
         <li class="nav-item"><a class="nav-link" asp-controller="Bookings" asp-action="Index">Lịch của tôi</a></li>
     }
+    @if (signedIn &&
+     User.IsInRole("Customer") &&
+     !User.IsInRole("Owner") &&
+     HasAction("OwnerRequests", "MyStatus"))
+{
+    <li class="nav-item">
+        <a class="nav-link"
+           asp-controller="OwnerRequests"
+           asp-action="MyStatus">
+            Trở thành Chủ cơ sở
+        </a>
+    </li>
+}
     @if (signedIn && User.IsInRole("Owner") && HasAction("Businesses", "Index"))
     {
         <li class="nav-item"><a class="nav-link" asp-controller="Businesses" asp-action="Index">Quản lý cơ sở</a></li>
@@ -38,6 +51,18 @@
     @if (signedIn && (User.IsInRole("Owner") || User.IsInRole("Admin")) && HasAction("Dashboard", "Index"))
     {
         <li class="nav-item"><a class="nav-link" asp-controller="Dashboard" asp-action="Index">Tổng quan</a></li>
+        @if (signedIn &&
+         User.IsInRole("Admin") &&
+         HasAction("OwnerRequests", "Index"))
+    {
+        <li class="nav-item">
+            <a class="nav-link"
+               asp-controller="OwnerRequests"
+               asp-action="Index">
+                Duyệt đăng ký Owner
+            </a>
+        </li>
+    }
     }
 </ul>
 <ul class="navbar-nav align-items-lg-center gap-2">

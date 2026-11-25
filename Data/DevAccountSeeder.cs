@@ -56,11 +56,16 @@ public static class DevAccountSeeder
         if (existingUser != null)
         {
             var roles = await userManager.GetRolesAsync(existingUser);
-            if (!roles.Contains(role) || (verifyPassword && roles.Count != 1))
-            {
-                throw new InvalidOperationException(
-                    $"Existing account does not have role {role}.");
-            }
+            // Customer demo được phép có thêm quyền Owner
+// sau khi được Admin phê duyệt.
+            var hasUnexpectedRole = verifyPassword &&
+             (role == "Customer"? roles.Any(r => r != "Customer" && r != "Owner"): roles.Count != 1);
+
+if (!roles.Contains(role) || hasUnexpectedRole)
+{
+    throw new InvalidOperationException(
+        $"Tài khoản hiện tại có vai trò không hợp lệ: {role}.");
+}
 
             if (verifyPassword && !await userManager.CheckPasswordAsync(existingUser, password))
                 throw new InvalidOperationException(

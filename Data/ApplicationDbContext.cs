@@ -18,6 +18,8 @@ public class ApplicationDbContext
     public DbSet<Service> Services => Set<Service>();
 
     public DbSet<Booking> Bookings => Set<Booking>();
+    public DbSet<OwnerRequest> OwnerRequests
+    => Set<OwnerRequest>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -65,5 +67,18 @@ public class ApplicationDbContext
                 b.StartTime,
                 b.EndTime
             });
+            // Quan hệ giữa yêu cầu Owner và tài khoản gửi yêu cầu
+            builder.Entity<OwnerRequest>(entity =>
+            {
+    entity.HasOne(x => x.User)
+        .WithMany()
+        .HasForeignKey(x => x.UserId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    // Một người chỉ được có một yêu cầu đang chờ duyệt
+    entity.HasIndex(x => x.UserId)
+        .IsUnique()
+        .HasFilter("[Status] = 0");
+});
     }
 }
