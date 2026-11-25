@@ -8,7 +8,7 @@ using ServiceHubMVC.Models;
 using Xunit;
 
 namespace ServiceHubMVC.Authorization.Tests;
-
+[Collection("AuthorizationDatabase")]
 public class IdentityPasswordPolicyTests
 {
     [Fact]
